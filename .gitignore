@@ -1,0 +1,17 @@
+node_modules/
+dist/
+client/dist/
+.env
+.env.local
+.env.*.local
+*.log
+npm-debug.log*
+.DS_Store
+.vercel
+.idea/
+.vscode/
+coverage/
+*.tsbuildinfo
+
+# Base de datos local de PGlite (contiene los usuarios de desarrollo)
+.redditleads/

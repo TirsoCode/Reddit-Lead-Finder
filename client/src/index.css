@@ -1,0 +1,56 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply bg-white text-ink font-sans;
+  }
+
+  ::selection {
+    @apply bg-brand-100 text-ink;
+  }
+}
+
+@layer components {
+  .focus-ring {
+    @apply outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white;
+  }
+
+  .card {
+    @apply rounded-xl border border-surface-line bg-white shadow-card;
+  }
+
+  .btn {
+    @apply focus-ring inline-flex items-center justify-center gap-2 rounded-lg text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .btn-primary {
+    @apply btn bg-brand-500 px-4 py-2.5 text-white hover:bg-brand-600 active:bg-brand-700;
+  }
+
+  .btn-secondary {
+    @apply btn border border-surface-line bg-white px-4 py-2.5 text-ink hover:bg-surface-subtle;
+  }
+
+  .btn-ghost {
+    @apply btn px-3 py-2 text-ink-muted hover:bg-surface-muted hover:text-ink;
+  }
+
+  .input {
+    @apply focus-ring w-full rounded-lg border border-surface-line bg-white px-3.5 py-2.5 text-sm text-ink placeholder:text-ink-faint hover:border-ink-faint focus:border-brand-500;
+  }
+
+  .label {
+    @apply mb-1.5 block text-sm font-medium text-ink-soft;
+  }
+
+  .pill {
+    @apply inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium;
+  }
+}
