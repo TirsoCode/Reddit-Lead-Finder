@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, type FormEvent } from 'react';
 import { IconCheck, IconComment, IconLink, IconReddit, IconSearch, IconSparkle, IconUpvote } from '../components/icons';
+import { HeroScene } from '../components/HeroScene';
 
 interface LandingProps {
   onAuth: () => void;
@@ -62,14 +63,20 @@ const FAQS = [
 
 export function Landing({ onAuth }: LandingProps) {
   const [openFaq, setOpenFaq] = useState<number | null>(0);
+  const [productUrl, setProductUrl] = useState('');
+
+  function handleFind(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    onAuth();
+  }
 
   return (
     <div className="min-h-screen bg-white">
       {/* ---------- Cabecera ---------- */}
-      <header className="sticky top-0 z-30 border-b border-surface-line bg-white/85 backdrop-blur">
+      <header className="sticky top-0 z-30 border-b border-[#F2E4D8] bg-[#FFF7F0]/85 backdrop-blur-md">
         <div className="mx-auto flex h-16 max-w-[1120px] items-center justify-between px-5 sm:px-8">
           <span className="flex items-center gap-2.5">
-            <span className="grid h-8 w-8 place-items-center rounded-lg bg-ink">
+            <span className="grid h-8 w-8 place-items-center rounded-lg bg-brand-500 shadow-sm">
               <IconReddit className="h-[18px] w-[18px] text-white" />
             </span>
             <span className="font-display text-[15px] font-bold tracking-tight text-ink">
@@ -89,42 +96,83 @@ export function Landing({ onAuth }: LandingProps) {
             </a>
           </nav>
 
-          <button type="button" onClick={onAuth} className="btn-primary px-3.5 py-2 text-[13px]">
-            Entrar
-          </button>
+          <div className="flex items-center gap-1 sm:gap-3">
+            <button
+              type="button"
+              onClick={onAuth}
+              className="focus-ring rounded-lg px-3 py-2 text-sm font-medium text-ink-soft transition hover:text-ink"
+            >
+              Entrar
+            </button>
+            <button type="button" onClick={onAuth} className="btn-primary px-4 py-2.5 text-sm">
+              Encuentra mi primer lead
+            </button>
+          </div>
         </div>
       </header>
 
       {/* ---------- Frase principal ---------- */}
-      <section className="mx-auto max-w-[1120px] px-5 pb-16 pt-16 text-center sm:px-8 sm:pt-24">
-        <span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-brand-50 text-brand-600">
-          <IconReddit className="h-7 w-7" />
-        </span>
+      <section className="relative isolate overflow-hidden bg-[linear-gradient(180deg,#FFFDFB_0%,#FFF6EE_46%,#FFE9DA_100%)]">
+        {/* sol cálido detrás del titular */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute left-1/2 top-[-140px] h-[460px] w-[820px] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(255,183,92,0.35),transparent)] blur-[10px]"
+        />
 
-        <h1 className="mx-auto mt-7 max-w-3xl font-display text-[34px] font-bold leading-[1.12] tracking-tight text-ink sm:text-[46px]">
-          Lee tu web, busca en Reddit y te dice{' '}
-          <span className="text-brand-600">dónde están tus clientes</span>
-        </h1>
+        {/* ilustración de la bahía */}
+        <HeroScene className="pointer-events-none absolute inset-x-0 bottom-0 h-[300px] sm:h-[52%] sm:min-h-[340px]" />
 
-        <p className="mx-auto mt-6 max-w-xl text-[17px] leading-relaxed text-ink-muted">
-          Pega la URL de lo que vendes. RedditLeads encuentra las conversaciones donde alguien
-          escribe su problema, las puntúa de 1 a 100 y te redacta la respuesta en español.
-        </p>
+        <div className="relative z-10 mx-auto max-w-[1120px] px-5 pb-[300px] pt-14 text-center sm:px-8 sm:pt-20 sm:pb-[44vh]">
+          <h1 className="mx-auto max-w-4xl font-display text-[36px] font-bold leading-[1.06] tracking-[-0.035em] text-ink sm:text-[60px] lg:text-[68px]">
+            <span className="block">
+              Consigue clientes en Reddit
+              <span className="ml-3 inline-grid h-[0.82em] w-[0.82em] place-items-center rounded-full bg-[#FF4500] align-baseline shadow-[0_8px_20px_rgba(255,69,0,0.35)]">
+                <IconReddit className="h-[0.48em] w-[0.48em] text-white" />
+              </span>
+            </span>
+            <span className="block">
+              sin que te{' '}
+              <mark className="box-decoration-clone rounded-[0.16em] bg-[#FFCDBF] px-[0.18em] pb-[0.06em] text-ink">
+                suspendan
+              </mark>
+            </span>
+          </h1>
 
-        <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
-          <button type="button" onClick={onAuth} className="btn-primary px-6 py-3">
-            Crear cuenta gratis
-          </button>
-          <a href="#como" className="btn-secondary px-6 py-3">
-            Ver cómo funciona
-          </a>
+          <p className="mx-auto mt-6 max-w-2xl text-[16px] leading-relaxed text-ink-soft sm:text-[18px]">
+            RedditLeads lee tu web, encuentra las conversaciones donde alguien tiene tu problema,
+            las puntúa del 1 al 100 y te redacta la respuesta en español. Tú solo copias y pegas.
+          </p>
+
+          <form
+            onSubmit={handleFind}
+            className="mx-auto mt-8 flex w-full max-w-[640px] flex-col gap-2 rounded-3xl bg-white p-2 shadow-pop ring-1 ring-black/[0.06] sm:flex-row sm:items-center sm:rounded-full"
+          >
+            <input
+              type="text"
+              inputMode="url"
+              value={productUrl}
+              onChange={(event) => setProductUrl(event.target.value)}
+              placeholder="tuproducto.com"
+              aria-label="URL de tu producto"
+              className="focus-ring min-w-0 flex-1 rounded-2xl border-0 bg-transparent px-4 py-3 text-[15px] text-ink placeholder:text-ink-faint sm:rounded-full"
+            />
+            <button
+              type="submit"
+              className="btn-primary shrink-0 gap-2 whitespace-nowrap rounded-2xl px-5 py-3 text-[15px] font-semibold sm:rounded-full"
+            >
+              Encuentra leads con intención
+              <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2.2}>
+                <path d="M4 12h15M13 6l6 6-6 6" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </button>
+          </form>
+
+          <p className="mt-4 text-sm text-ink-faint">Sin tarjeta. Solo tu email y la URL de tu producto.</p>
         </div>
-
-        <p className="mt-5 text-sm text-ink-faint">Sin tarjeta. Solo tu email y la URL de tu producto.</p>
       </section>
 
       {/* ---------- Qué es, con dibujo de Reddit ---------- */}
-      <section id="que-es" className="border-t border-surface-line bg-surface-subtle">
+      <section id="que-es" className="bg-[#FFF9F4]">
         <div className="mx-auto grid max-w-[1120px] items-center gap-14 px-5 py-20 sm:px-8 lg:grid-cols-2 lg:gap-20">
           <div>
             <h2 className="font-display text-[28px] font-bold leading-tight tracking-tight text-ink sm:text-[32px]">
@@ -197,7 +245,7 @@ export function Landing({ onAuth }: LandingProps) {
       </section>
 
       {/* ---------- Preguntas frecuentes ---------- */}
-      <section id="faq" className="border-t border-surface-line bg-surface-subtle">
+      <section id="faq" className="border-t border-[#F2E4D8] bg-[#FFF9F4]">
         <div className="mx-auto max-w-[820px] px-5 py-20 sm:px-8">
           <h2 className="font-display text-[28px] font-bold leading-tight tracking-tight text-ink sm:text-[32px]">
             Preguntas frecuentes
@@ -240,7 +288,7 @@ export function Landing({ onAuth }: LandingProps) {
       </section>
 
       {/* ---------- Cierre ---------- */}
-      <section className="border-t border-surface-line">
+      <section className="border-t border-[#F2E4D8] bg-[linear-gradient(180deg,#FFFFFF_0%,#FFF1E6_100%)]">
         <div className="mx-auto max-w-[1120px] px-5 py-20 text-center sm:px-8">
           <h2 className="mx-auto max-w-2xl font-display text-[28px] font-bold leading-tight tracking-tight text-ink sm:text-[34px]">
             Empieza a leer lo que se dice de tu problema

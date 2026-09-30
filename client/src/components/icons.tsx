@@ -19,11 +19,24 @@ function Base({ children, ...props }: IconProps) {
   );
 }
 
-/** Logotipo de Reddit, relleno (no usa Base porque es una marca sólida). */
+/**
+ * Logotipo de Reddit (snoo) en un solo color: cabeza rellena con los ojos y la
+ * boca calados (fill-rule evenodd) y la antena con su bola encima.
+ */
 export function IconReddit(props: IconProps) {
   return (
     <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" {...props}>
-      <path d="M12 0C5.373 0 0 5.373 0 12c0 3.314 1.343 6.314 3.515 8.485l-2.286 2.286C.775 23.225 1.097 24 1.738 24H12c6.627 0 12-5.373 12-12S18.627 0 12 0Zm4.388 3.199a1.999 1.999 0 1 1 0 4 1.999 1.999 0 0 1 0-4ZM12.523 11.37c1.863 0 3.375.672 3.375 1.502s-1.512 1.502-3.375 1.502-3.375-.672-3.375-1.502 1.512-1.502 3.375-1.502Zm-4.911 1.328a1.999 1.999 0 1 1 0 4 1.999 1.999 0 0 1 0-4Zm10.334-1.422a2.002 2.002 0 1 1 0 4 2.002 2.002 0 0 1 0-4Z" />
+      {/* antena */}
+      <path d="M10.4 5.9 8 4.2" stroke="currentColor" strokeWidth={1.7} strokeLinecap="round" fill="none" />
+      <circle cx={6.9} cy={3.5} r={2.1} />
+      {/* cabeza + huecos (ojos y sonrisa) */}
+      <path
+        fillRule="evenodd"
+        d="M3.1 12.3a8.9 6.9 0 1 0 17.8 0 8.9 6.9 0 1 0-17.8 0Z
+           M6.6 12.3a2.3 2.3 0 1 0 4.6 0 2.3 2.3 0 1 0-4.6 0Z
+           M12.8 12.3a2.3 2.3 0 1 0 4.6 0 2.3 2.3 0 1 0-4.6 0Z
+           M8.6 14.8a3.6 3.6 0 0 0 6.8 0 8 8 0 0 1-6.8 0Z"
+      />
     </svg>
   );
 }
