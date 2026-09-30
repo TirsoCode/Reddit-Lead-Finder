@@ -73,21 +73,41 @@ export function Dashboard({ profile, onProfileChange, onOpenLeads }: DashboardPr
     );
   }
 
+  // PostCard no captura los rechazos: sin esto el usuario no ve ningún aviso.
+  function reportActionError(caught: unknown, fallback: string): void {
+    setNotice(null);
+    setError(caught instanceof ApiError ? caught.message : fallback);
+  }
+
   async function handleGenerateReply(leadId: string) {
-    const { lead } = await api.generateReply(leadId);
-    await refreshLead(leadId, lead.reply);
+    try {
+      const { lead } = await api.generateReply(leadId);
+      await refreshLead(leadId, lead.reply);
+    } catch (caught) {
+      reportActionError(caught, 'No se pudo generar la respuesta');
+    }
   }
 
   async function handleStatusChange(leadId: string, status: Lead['status']) {
-    const { lead } = await api.setLeadStatus(leadId, status);
-    setTopLeads((current) =>
-      current.map((item) => (item.id === leadId ? lead : item)).filter((item) => item.status !== 'dismissed'),
-    );
+    try {
+      const { lead } = await api.setLeadStatus(leadId, status);
+      setTopLeads((current) =>
+        current
+          .map((item) => (item.id === leadId ? lead : item))
+          .filter((item) => item.status !== 'dismissed'),
+      );
+    } catch (caught) {
+      reportActionError(caught, 'No se pudo cambiar el estado del post');
+    }
   }
 
   async function handleDismiss(leadId: string) {
-    await api.setLeadStatus(leadId, 'dismissed');
-    setTopLeads((current) => current.filter((lead) => lead.id !== leadId));
+    try {
+      await api.setLeadStatus(leadId, 'dismissed');
+      setTopLeads((current) => current.filter((lead) => lead.id !== leadId));
+    } catch (caught) {
+      reportActionError(caught, 'No se pudo descartar el post');
+    }
   }
 
   const needsSetup = !profile?.product_url || profile?.analysis_status !== 'ready';

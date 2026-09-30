@@ -15,3 +15,4 @@ coverage/
 
 # Base de datos local de PGlite (contiene los usuarios de desarrollo)
 .redditleads/
+.env*

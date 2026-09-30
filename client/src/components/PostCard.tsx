@@ -256,7 +256,10 @@ export function PostCard({
 
             <button
               type="button"
-              onClick={() => void onDismiss(lead.id)}
+              onClick={() => {
+                setBusy('dismiss');
+                void onDismiss(lead.id).finally(() => setBusy(null));
+              }}
               disabled={busy !== null}
               aria-label="Eliminar post"
               className="btn-ghost ml-auto px-2 py-1 text-xs text-ink-faint hover:text-brand-600"

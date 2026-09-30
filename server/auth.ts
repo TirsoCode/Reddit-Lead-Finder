@@ -1,5 +1,6 @@
 import type { User } from '@supabase/supabase-js';
 import { createClient } from '@supabase/supabase-js';
+import { createHash } from 'node:crypto';
 import { env } from './env.js';
 import { verifyDevToken } from './devJwt.js';
 import { HttpError } from './errors.js';
@@ -35,11 +36,9 @@ const userCache = new Map<string, CachedUser>();
 
 function cacheKey(token: string): string {
   // El JWT es largo; solo guardamos una huella para no retenerlo en memoria.
-  let hash = 0;
-  for (let i = 0; i < token.length; i += 1) {
-    hash = (hash * 31 + token.charCodeAt(i)) | 0;
-  }
-  return `${hash}:${token.length}`;
+  // SHA-256 y no un hash propio: una colisión aquí devolvería el usuario de
+  // otro token, es decir, los datos de otra cuenta.
+  return createHash('sha256').update(token).digest('hex');
 }
 
 /** Construye el objeto User que espera el resto del código a partir del token local. */

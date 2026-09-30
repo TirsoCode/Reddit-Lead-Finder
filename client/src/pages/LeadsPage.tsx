@@ -89,6 +89,12 @@ export function LeadsPage({ pendingReplies, onProfileChange }: LeadsPageProps) {
   }, [status, sort, minRelevance]);
 
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+
+  // Al borrar o descartar un post, la última página puede quedarse vacía.
+  useEffect(() => {
+    if (!loading && leads.length === 0 && page > 0) setPage((value) => value - 1);
+  }, [loading, leads.length, page]);
+
   const rangeLabel = useMemo(() => {
     if (total === 0) return '0 posts';
     const from = page * PAGE_SIZE + 1;
@@ -143,23 +149,44 @@ export function LeadsPage({ pendingReplies, onProfileChange }: LeadsPageProps) {
     setLeads((current) => current.map((lead) => (lead.id === leadId ? { ...lead, ...changes } : lead)));
   }
 
+  // PostCard no captura los errores: si la petición falla hay que avisar aquí,
+  // o el rechazo se queda sin manejar y el usuario no ve nada.
+  function reportActionError(caught: unknown, fallback: string): void {
+    setNotice(null);
+    setError(caught instanceof ApiError ? caught.message : fallback);
+  }
+
   async function handleGenerateReply(leadId: string) {
-    const { lead } = await api.generateReply(leadId);
-    patchLead(leadId, lead);
+    try {
+      const { lead } = await api.generateReply(leadId);
+      patchLead(leadId, lead);
+    } catch (caught) {
+      reportActionError(caught, 'No se pudo generar la respuesta');
+    }
   }
 
   async function handleStatusChange(leadId: string, nextStatus: LeadStatus) {
-    const { lead } = await api.setLeadStatus(leadId, nextStatus);
-    setLeads((current) =>
-      current.map((item) => (item.id === leadId ? lead : item)).filter((item) => item.status !== 'dismissed'),
-    );
-    void onProfileChange();
+    try {
+      const { lead } = await api.setLeadStatus(leadId, nextStatus);
+      setLeads((current) =>
+        current
+          .map((item) => (item.id === leadId ? lead : item))
+          .filter((item) => item.status !== 'dismissed'),
+      );
+      void onProfileChange();
+    } catch (caught) {
+      reportActionError(caught, 'No se pudo cambiar el estado del post');
+    }
   }
 
   async function handleDismiss(leadId: string) {
-    await api.setLeadStatus(leadId, 'dismissed');
-    setLeads((current) => current.filter((lead) => lead.id !== leadId));
-    setTotal((value) => Math.max(0, value - 1));
+    try {
+      await api.setLeadStatus(leadId, 'dismissed');
+      setLeads((current) => current.filter((lead) => lead.id !== leadId));
+      setTotal((value) => Math.max(0, value - 1));
+    } catch (caught) {
+      reportActionError(caught, 'No se pudo descartar el post');
+    }
   }
 
   return (
