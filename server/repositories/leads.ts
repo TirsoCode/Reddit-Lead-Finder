@@ -37,9 +37,12 @@ export async function upsertLeads(
 ): Promise<{ inserted: number; touched: number }> {
   if (posts.length === 0) return { inserted: 0, touched: 0 };
 
+  // 12 columnas por fila: el salto de los marcadores debe coincidir con ellas.
+  const COLUMNS_PER_ROW = 12;
+
   const values: unknown[] = [];
   const tuples = posts.map((post, index) => {
-    const base = index * 10;
+    const base = index * COLUMNS_PER_ROW;
     values.push(
       userId,
       post.redditId,
@@ -189,9 +192,10 @@ export interface ScoreUpdate {
 export async function saveScores(userId: string, scores: ScoreUpdate[]): Promise<number> {
   if (scores.length === 0) return 0;
 
+  // $1 es user_id, así que los tríos de cada fila empiezan en $2.
   const params: unknown[] = [userId];
   const tuples = scores.map((score, index) => {
-    const base = index * 3 + 1;
+    const base = index * 3 + 2;
     params.push(score.redditId, Math.max(1, Math.min(100, Math.round(score.relevance))), score.reason ?? null);
     return `($${base}::text, $${base + 1}::int, $${base + 2}::text)`;
   });

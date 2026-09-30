@@ -86,7 +86,6 @@ profileRouter.patch('/', async (req, res, next) => {
       throw HttpError.badRequest('No hay nada que actualizar');
     }
 
-    await ensureProfile(auth.userId);
     let profile = await ensureProfile(auth.userId);
 
     if (body.data.tone) profile = await setTone(auth.userId, body.data.tone as Tone);

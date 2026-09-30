@@ -18,7 +18,8 @@ import {
   saveAnalysis,
   setProductUrl,
 } from '../repositories/profile.js';
-import { finishRun, hasRunInFlight, lastRun, reapStaleRuns, startRun } from '../repositories/runs.js';
+import { finishRun, hasRunInFlight, reapStaleRuns, startRun } from '../repositories/runs.js';
+import { HttpError } from '../errors.js';
 import { startOfDayInTimezone } from '../time.js';
 import type { Lead, Profile, RunTrigger, Stats } from '../types.js';
 import { analyzeProduct } from './analyze.js';
@@ -111,14 +112,17 @@ export interface ScanResult {
 export async function runScan(userId: string, trigger: RunTrigger): Promise<ScanResult> {
   const profile = await ensureProfile(userId);
 
-  if (!profile.product_url) throw new Error('Configura primero la URL de tu producto');
+  // Errores de negocio: llegan al cliente con su mensaje (400/409) en vez de
+  // caer en el middleware genérico y mostrarse como "error inesperado".
+  if (!profile.product_url) {
+    throw HttpError.badRequest('Configura primero la URL de tu producto');
+  }
   if (profile.analysis_status !== 'ready') {
-    throw new Error('El análisis de tu web no está listo todavía');
+    throw HttpError.conflict('El análisis de tu web no está listo todavía');
   }
 
   if (await hasRunInFlight(userId)) {
-    const running = await lastRun(userId);
-    throw new Error('Ya hay una búsqueda en curso. Espera a que termine.');
+    throw HttpError.conflict('Ya hay una búsqueda en curso. Espera a que termine.');
   }
 
   const run = await startRun(userId, trigger);
@@ -257,11 +261,11 @@ export async function generateReplies(profile: Profile, leads: Lead[]): Promise<
 export async function refreshReply(userId: string, leadId: string): Promise<Lead> {
   const profile = await ensureProfile(userId);
   const lead = await getLead(userId, leadId);
-  if (!lead) throw new Error('Lead no encontrado');
+  if (!lead) throw HttpError.notFound('Ese post no existe o ya no está en tu bandeja');
 
   const reply = await generateReply(profile, lead);
   const updated = await setReply(userId, leadId, reply, profile.tone);
-  if (!updated) throw new Error('No se pudo guardar la respuesta');
+  if (!updated) throw HttpError.notFound('Ese post ya no está en tu bandeja');
   return updated;
 }
 

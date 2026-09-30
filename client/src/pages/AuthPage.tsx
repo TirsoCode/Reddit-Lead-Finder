@@ -2,6 +2,7 @@ import { useEffect, useState, type FormEvent } from 'react';
 import { isAuthConfigured, signIn, signInWithGoogle, signUp, useDevAuth } from '../lib/auth';
 import { Spinner } from '../components/ui';
 import { IconArrowLeft } from '../components/icons';
+import { Logo } from '../components/Logo';
 
 type Mode = 'login' | 'signup';
 
@@ -103,17 +104,8 @@ export function AuthPage({ onBack }: AuthPageProps) {
               </button>
             ) : null}
 
-            <div className="mb-9 flex items-center gap-2.5">
-              <span className="grid h-9 w-9 place-items-center rounded-lg bg-ink">
-                <span className="grid h-4 w-4 grid-cols-2 gap-[2px]">
-                  <span className="rounded-[1px] bg-brand-500" />
-                  <span className="rounded-[1px] bg-white" />
-                  <span className="col-span-2 rounded-[1px] bg-brand-500" />
-                </span>
-              </span>
-              <span className="font-display text-lg font-bold tracking-tight">
-                Reddit<span className="text-brand-500">Leads</span>
-              </span>
+            <div className="mb-9">
+              <Logo />
             </div>
 
             <h1 className="font-display text-[26px] font-bold leading-tight tracking-tight text-ink">

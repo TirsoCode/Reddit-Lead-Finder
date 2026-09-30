@@ -1,6 +1,7 @@
 import { NavLink } from 'react-router-dom';
 import { cx } from '../lib/format';
 import { IconClose, IconDashboard, IconLogout } from './icons';
+import { Logo } from './Logo';
 
 export interface NavItem {
   to: string;
@@ -16,23 +17,6 @@ interface SidebarProps {
   onSignOut: () => void;
   mobileOpen: boolean;
   onCloseMobile: () => void;
-}
-
-function Logo() {
-  return (
-    <div className="flex items-center gap-2.5">
-      <span className="grid h-8 w-8 place-items-center rounded-lg bg-ink">
-        <span className="grid h-3.5 w-3.5 grid-cols-2 gap-[2px]">
-          <span className="rounded-[1px] bg-brand-500" />
-          <span className="rounded-[1px] bg-white" />
-          <span className="col-span-2 rounded-[1px] bg-brand-500" />
-        </span>
-      </span>
-      <span className="font-display text-[17px] font-bold tracking-tight text-ink">
-        Reddit<span className="text-brand-500">Leads</span>
-      </span>
-    </div>
-  );
 }
 
 export function Sidebar({ items, email, onSignOut, mobileOpen, onCloseMobile }: SidebarProps) {

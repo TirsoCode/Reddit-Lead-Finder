@@ -41,7 +41,7 @@ export function startOfDayInTimezone(timeZone: string, now = new Date()): Date {
   }
 }
 
-/** Suma días a un instante UTC conservando la hora local del usuario. */
-export function addDaysInTimezone(date: Date, days: number, timeZone: string): Date {
-  return new Date(date.getTime() + days * 86_400_000 + offsetMs(date, timeZone) * 0);
+/** Suma días naturales a un instante UTC. */
+export function addDays(date: Date, days: number): Date {
+  return new Date(date.getTime() + days * 86_400_000);
 }

@@ -27,9 +27,10 @@ export async function getProfile(userId: string): Promise<Profile | null> {
 
 export async function setProductUrl(userId: string, url: string | null): Promise<Profile> {
   const row = await queryOne<ProfileRow>(
+    // Cambiar la URL invalida el análisis anterior: hay que volver a analizar.
     `update public.profiles
         set product_url = $2,
-            analysis_status = case when $2 is null then 'idle' else 'idle' end,
+            analysis_status = 'idle',
             analysis_error = null,
             updated_at = now()
       where id = $1

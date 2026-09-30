@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { IconCheck, IconComment, IconLink, IconReddit, IconSearch, IconSparkle, IconUpvote } from '../components/icons';
+import { LogoMark } from '../components/Logo';
 import { HeroScene } from '../components/HeroScene';
 
 interface LandingProps {
@@ -80,7 +81,7 @@ export function Landing({ onAuth }: LandingProps) {
               <IconReddit className="h-[18px] w-[18px] text-white" />
             </span>
             <span className="font-display text-[15px] font-bold tracking-tight text-ink">
-              Reddit<span className="text-brand-500">Leads</span>
+              Reply<span className="text-brand-500">Hey</span>
             </span>
           </span>
 
@@ -131,9 +132,8 @@ export function Landing({ onAuth }: LandingProps) {
               </span>
             </span>
             <span className="block">
-              sin que te{' '}
               <mark className="box-decoration-clone rounded-[0.16em] bg-[#FFCDBF] px-[0.18em] pb-[0.06em] text-ink">
-                suspendan
+                gratis y fácil
               </mark>
             </span>
           </h1>
@@ -302,7 +302,7 @@ export function Landing({ onAuth }: LandingProps) {
       <footer className="border-t border-surface-line">
         <div className="mx-auto flex max-w-[1120px] flex-col items-center justify-between gap-3 px-5 py-8 sm:flex-row sm:px-8">
           <span className="flex items-center gap-2 text-sm text-ink-faint">
-            <IconReddit className="h-4 w-4" />
+            <LogoMark className="h-6 w-6" />
             RedditLeads
           </span>
           <p className="text-xs text-ink-faint">
