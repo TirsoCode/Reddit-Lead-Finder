@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import {
   IconCheck,
+  IconClose,
   IconComment,
   IconCopy,
   IconEye,
@@ -171,6 +172,110 @@ const FAQS = [
     q: '¿Necesito tarjeta de crédito?',
     a: 'No. Se crea la cuenta con un email y ya puedes pegar tu URL.',
   },
+  {
+    q: '¿Qué pasa si mi producto es una web en inglés?',
+    a: 'Funciona igual: la web se lee en el idioma que tenga. Lo único que sale siempre en español son los borradores, porque el subreddit donde vas a publicar es el que decides tú.',
+  },
+  {
+    q: '¿Y si mi producto no encaja en Reddit?',
+    a: 'Entonces la cola te lo dirá: los posts que no tienen nada que ver se quedan por debajo de 40 y no te obligan a leerlos. La nota existe justo para eso.',
+  },
+  {
+    q: '¿Cuánto tarda el primer barrido?',
+    a: 'Pones tu URL y el primero corre enseguida. A partir de ahí son dos al día, a las 8:00 y a las 20:00, y puedes lanzar uno a mano cuando quieras.',
+  },
+  {
+    q: '¿Puedo editar la respuesta antes de publicarla?',
+    a: 'Sí, y deberías. El borrador es un punto de partida: lo editas, lo apruebas o lo escribes entero tú desde cero. RedditLeads no publica nunca por ti.',
+  },
+  {
+    q: '¿Qué pasa si me banean de un subreddit?',
+    a: 'La ficha de cada lead lleva las normas de esa comunidad antes de que respondas. Si no admite autopromoción, lo pone y te dice que cuentes solo tu experiencia.',
+  },
+];
+
+/** Lo que cuesta rastrear el problema a mano, paso a paso. */
+const A_MANO = [
+  'Abrir Reddit y probar tu producto en el buscador, frase por frase, hasta que algo encaja.',
+  'Leer los resultados uno a uno para decidir si son tu cliente o ruido.',
+  'Adivinar si aquel subreddit permite nombrar herramientas o te banean.',
+  'Escribir la respuesta en frío, sin contexto y sin tiempo.',
+  'Volver al día siguiente y acordarte de dónde lo habías dejado.',
+];
+
+/** Lo mismo, con la app: el mismo trabajo, pero en cola y ya filtrado. */
+const CON_LA_APP = [
+  'Dos barridos al día sobre las 48 horas más recientes, sin que tengas que acordarte.',
+  'Cada post puntuado del 0 al 100 con la frase exacta que le subió la nota.',
+  'Las normas de esa comunidad leídas y resumidas en la propia ficha del lead.',
+  'La respuesta escrita en español, en tu tono, lista para copiar y pegar.',
+  'Una cola ordenada y sin duplicados entre barridos.',
+];
+
+/** Cómo se lee la nota: los cuatro tramos y qué hacer con cada uno. */
+const SCORE_BANDS = [
+  {
+    range: '80–100',
+    title: 'Habla de tu problema',
+    body: 'Describe tu situación y, de paso, dice que busca algo para resolverla. Estos se responden el mismo día.',
+    swatch: 'bg-brand-500',
+  },
+  {
+    range: '60–79',
+    title: 'Va de camino',
+    body: 'El problema está sobre la mesa pero todavía no pide herramienta. Vale la pena leerlo antes de que se enfríe.',
+    swatch: 'bg-brand-300',
+  },
+  {
+    range: '40–59',
+    title: 'Ruido',
+    body: 'Habla de tu sector, pero no de tu cliente ni de tu problema. Se queda en la cola sin molestarte.',
+    swatch: 'bg-surface-muted',
+  },
+  {
+    range: '0–39',
+    title: 'Descartado',
+    body: 'No tiene nada que ver. RedditLeads lo aparta antes de que llegue a tu lista.',
+    swatch: 'bg-surface-subtle',
+  },
+];
+
+/** El día tipo de quien usa la app, de las 8:00 a las 20:00. */
+const DAY = [
+  {
+    time: '08:00',
+    title: 'Llega el barrido de la mañana',
+    body: 'RedditLeads recorre lo publicado en las últimas 48 horas, puntúa cada post y deja la cola ordenada.',
+  },
+  {
+    time: '09:00',
+    title: 'Abres los que puntúan alto',
+    body: 'Lees el lead, decides si quieres responder y copias el borrador a tu propia cuenta de Reddit.',
+  },
+  {
+    time: '12:00',
+    title: 'Contestamos a un par de hilos',
+    body: 'Diez minutos. Sin想一想 si puedes mencionar tu producto: la ficha te lo dice antes.',
+  },
+  {
+    time: '20:00',
+    title: 'Segundo barrido del día',
+    body: 'Lo que ha aparecido por la tarde entra en la misma cola, sin repetir lo que ya viste.',
+  },
+];
+
+/** A quién le viene bien esto, y a quién no. */
+const PARA_QUE_SI = [
+  'Vendes un producto digital o un servicio a clientes finales, no entre empresas.',
+  'Tu cliente habla español y usa Reddit a diario.',
+  'Puedes responder con detalle y decir de quién eres sin que suene a anuncio.',
+  'Hoy revisas esto a mano y quieres dejar de hacerlo.',
+];
+
+const PARA_QUE_NO = [
+  'Buscas que la app publique respuestas por ti: no lo hace, y es a propósito.',
+  'No vas a leer ninguna respuesta ni tienes tiempo para usar lo que encuentres.',
+  'Tu producto no encaja en Reddit y en la cola no va a aparecer nadie.',
 ];
 
 export function Landing({ onAuth }: LandingProps) {
@@ -188,21 +293,30 @@ export function Landing({ onAuth }: LandingProps) {
       <header className="sticky top-0 z-30 border-b border-[#F2E4D8] bg-[#FFF7F0]/85 backdrop-blur-md">
         <div className="mx-auto flex h-16 max-w-[1120px] items-center justify-between px-5 sm:px-8">
           <span className="flex items-center gap-2.5">
-            <LogoMark className="h-8 w-8" />
+            <LogoMark className="h-7 w-7" />
             <span className="font-display text-[15px] font-bold tracking-tight text-ink">
               Reddit<span className="text-brand-500">Leads</span>
             </span>
           </span>
 
-          <nav className="hidden items-center gap-8 md:flex">
+          <nav className="hidden items-center gap-7 md:flex xl:gap-8">
+            <a href="#problema" className="text-sm text-ink-muted transition hover:text-ink">
+              El problema
+            </a>
             <a href="#como" className="text-sm text-ink-muted transition hover:text-ink">
               Cómo funciona
             </a>
             <a href="#cola" className="text-sm text-ink-muted transition hover:text-ink">
               La cola de hoy
             </a>
-            <a href="#seguridad" className="text-sm text-ink-muted transition hover:text-ink">
-              Seguridad
+            <a href="#nota" className="text-sm text-ink-muted transition hover:text-ink">
+              La nota
+            </a>
+            <a href="#dia" className="text-sm text-ink-muted transition hover:text-ink">
+              Un día
+            </a>
+            <a href="#para-quien" className="text-sm text-ink-muted transition hover:text-ink">
+              Para quién es
             </a>
             <a href="#faq" className="text-sm text-ink-muted transition hover:text-ink">
               Preguntas
@@ -305,6 +419,57 @@ export function Landing({ onAuth }: LandingProps) {
         </div>
       </section>
 
+      {/* ---------- El problema: a mano vs. en la cola ---------- */}
+      <section id="problema" className="border-t border-surface-line bg-white">
+        <div className="mx-auto max-w-[1120px] px-5 py-20 sm:px-8">
+          <div className="max-w-2xl">
+            <h2 className="font-display text-[28px] font-bold leading-tight tracking-tight text-ink sm:text-[32px]">
+              Rastrear el problema a mano es una faena
+            </h2>
+            <p className="mt-5 text-[15px] leading-relaxed text-ink-muted">
+              Nadie se levanta a buscar lo que le duele a su cliente cada día. Se hace de vez en
+              cuando, a ratos, y se abandona. Lo que hace RedditLeads es exactamente ese trabajo, cada
+              día, sin que tengas que acordarte.
+            </p>
+          </div>
+
+          <div className="mt-12 grid gap-4 lg:grid-cols-2 lg:gap-6">
+            <article className="rounded-2xl border border-surface-line bg-white p-6 sm:p-7">
+              <h3 className="font-display text-[17px] font-bold tracking-tight text-ink-muted">
+                A mano
+              </h3>
+              <ul className="mt-5 space-y-4">
+                {A_MANO.map((item, index) => (
+                  <li key={item} className="flex gap-3.5 text-[14.5px] leading-relaxed text-ink-muted">
+                    <span className="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full bg-surface-muted text-[12px] font-bold text-ink-faint">
+                      {index + 1}
+                    </span>
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </article>
+
+            <article className="rounded-2xl border border-brand-200 bg-brand-50/60 p-6 shadow-card sm:p-7">
+              <h3 className="flex items-center gap-2 font-display text-[17px] font-bold tracking-tight text-ink">
+                <IconReddit className="h-4 w-4 text-brand-500" />
+                Con RedditLeads
+              </h3>
+              <ul className="mt-5 space-y-4">
+                {CON_LA_APP.map((item) => (
+                  <li key={item} className="flex gap-3.5 text-[14.5px] leading-relaxed text-ink-soft">
+                    <span className="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full bg-brand-500 text-[12px] font-bold text-white">
+                      <IconCheck className="h-3.5 w-3.5" />
+                    </span>
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </article>
+          </div>
+        </div>
+      </section>
+
       {/* ---------- Pasos, con sus maquetas ---------- */}
       <section id="como" className="border-t border-surface-line bg-white">
         <div className="mx-auto max-w-[1120px] px-5 py-20 sm:px-8">
@@ -365,6 +530,132 @@ export function Landing({ onAuth }: LandingProps) {
           </div>
 
           <QueueDemo onAuth={onAuth} />
+        </div>
+      </section>
+
+      {/* ---------- La nota, explicada ---------- */}
+      <section id="nota" className="border-t border-[#F2E4D8] bg-white">
+        <div className="mx-auto max-w-[1120px] px-5 py-20 sm:px-8">
+          <div className="max-w-2xl">
+            <h2 className="font-display text-[28px] font-bold leading-tight tracking-tight text-ink sm:text-[32px]">
+              Qué significa la nota
+            </h2>
+            <p className="mt-5 text-[15px] leading-relaxed text-ink-muted">
+              La nota no la pone una persona, y no es un adivino: es el resultado de comparar el
+              post con lo que realmente vendes. Cada lead te enseña la frase exacta por la que
+              subió, para que decidas con criterio y no con fe.
+            </p>
+          </div>
+
+          <div className="mt-12 grid gap-px overflow-hidden rounded-2xl border border-surface-line bg-surface-line sm:grid-cols-2 lg:grid-cols-4">
+            {SCORE_BANDS.map((band) => (
+              <div key={band.range} className="bg-white p-6">
+                <span className="flex items-center gap-2.5">
+                  <span className={cx('h-2.5 w-2.5 rounded-full', band.swatch)} />
+                  <span className="font-display text-[15px] font-bold tracking-tight text-ink">
+                    {band.range}
+                  </span>
+                </span>
+                <h3 className="mt-4 font-display text-[15.5px] font-semibold tracking-tight text-ink">
+                  {band.title}
+                </h3>
+                <p className="mt-2 text-[13.5px] leading-relaxed text-ink-muted">{band.body}</p>
+              </div>
+            ))}
+          </div>
+
+          <p className="mt-6 text-[14px] text-ink-faint">
+            Por debajo de 50 lo tratamos como ruido, así que no te roba tiempo ni te llena la cola.
+          </p>
+        </div>
+      </section>
+
+      {/* ---------- Un día con la app ---------- */}
+      <section id="dia" className="border-t border-[#F2E4D8] bg-[#FFF9F4]">
+        <div className="mx-auto max-w-[1120px] px-5 py-20 sm:px-8">
+          <div className="max-w-2xl">
+            <h2 className="font-display text-[28px] font-bold leading-tight tracking-tight text-ink sm:text-[32px]">
+              Un día con la app
+            </h2>
+            <p className="mt-5 text-[15px] leading-relaxed text-ink-muted">
+              Son dos barridos al día. Tú solo abres la cola, lees los que puntúan alto y decides a
+              quién quieres responder.
+            </p>
+          </div>
+
+          <ol className="mt-12 space-y-0">
+            {DAY.map((moment, index) => (
+              <li key={moment.time} className="relative flex gap-5 pb-8 last:pb-0 sm:gap-7">
+                {index < DAY.length - 1 ? (
+                  <span
+                    aria-hidden="true"
+                    className="absolute left-[19px] top-10 h-full w-px bg-[#F2E4D8] sm:left-[23px]"
+                  />
+                ) : null}
+                <span className="relative z-10 grid h-10 w-10 shrink-0 place-items-center rounded-full bg-brand-500 text-[11px] font-bold text-white sm:h-12 sm:w-12 sm:text-[12px]">
+                  {moment.time}
+                </span>
+                <div className="pt-0.5">
+                  <h3 className="font-display text-[17px] font-bold tracking-tight text-ink sm:text-[18px]">
+                    {moment.title}
+                  </h3>
+                  <p className="mt-2 max-w-2xl text-[14.5px] leading-relaxed text-ink-muted">
+                    {moment.body}
+                  </p>
+                </div>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+
+      {/* ---------- Para quién es ---------- */}
+      <section id="para-quien" className="border-t border-surface-line bg-white">
+        <div className="mx-auto max-w-[1120px] px-5 py-20 sm:px-8">
+          <div className="max-w-2xl">
+            <h2 className="font-display text-[28px] font-bold leading-tight tracking-tight text-ink sm:text-[32px]">
+              Para quién es, y para quién no
+            </h2>
+            <p className="mt-5 text-[15px] leading-relaxed text-ink-muted">
+              Preferimos que sepas si esto te sirve antes de que te registres.
+            </p>
+          </div>
+
+          <div className="mt-12 grid gap-4 lg:grid-cols-2 lg:gap-6">
+            <article className="rounded-2xl border border-surface-line bg-white p-6 sm:p-7">
+              <h3 className="flex items-center gap-2.5 font-display text-[17px] font-bold tracking-tight text-ink">
+                <span className="grid h-8 w-8 place-items-center rounded-lg bg-brand-50 text-brand-600">
+                  <IconCheck className="h-4 w-4" />
+                </span>
+                Te sirve si…
+              </h3>
+              <ul className="mt-6 space-y-4">
+                {PARA_QUE_SI.map((item) => (
+                  <li key={item} className="flex gap-3.5 text-[14.5px] leading-relaxed text-ink-soft">
+                    <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-500" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </article>
+
+            <article className="rounded-2xl border border-surface-line bg-surface-subtle p-6 sm:p-7">
+              <h3 className="flex items-center gap-2.5 font-display text-[17px] font-bold tracking-tight text-ink">
+                <span className="grid h-8 w-8 place-items-center rounded-lg bg-surface-muted text-ink-faint">
+                  <IconClose className="h-4 w-4" />
+                </span>
+                No te sirve si…
+              </h3>
+              <ul className="mt-6 space-y-4">
+                {PARA_QUE_NO.map((item) => (
+                  <li key={item} className="flex gap-3.5 text-[14.5px] leading-relaxed text-ink-muted">
+                    <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-ink-faint" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </article>
+          </div>
         </div>
       </section>
 
