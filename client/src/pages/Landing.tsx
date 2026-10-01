@@ -113,25 +113,22 @@ export function Landing({ onAuth }: LandingProps) {
 
       {/* ---------- Frase principal ---------- */}
       <section className="relative isolate overflow-hidden bg-[#DCE9F0]">
-        {/* fondo de la portada */}
-        <div
-          aria-hidden="true"
-          className="absolute inset-0 bg-[url('/hero-landscape.webp')] bg-cover bg-[position:center_32%]"
-        />
+        {/* fondo: la imagen a todo el ancho */}
+        <div aria-hidden="true" className="hero-photo absolute inset-0" />
 
-        {/* velo claro: mantiene el titular legible y funde la foto con el color de la página */}
-        <div
-          aria-hidden="true"
-          className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.82)_0%,rgba(255,255,255,0.66)_36%,rgba(255,251,244,0.36)_55%,rgba(255,246,235,0.1)_72%,rgba(255,246,235,0)_82%)]"
-        />
+        {/* velo claro: mantiene el titular legible y funde la foto con la página */}
+        <div aria-hidden="true" className="hero-veil absolute inset-0" />
 
         <div className="relative z-10 mx-auto max-w-[1120px] px-5 pb-[300px] pt-14 text-center sm:px-8 sm:pt-20 sm:pb-[44vh]">
           <h1 className="mx-auto max-w-4xl font-display text-[36px] font-bold leading-[1.06] tracking-[-0.035em] text-ink sm:text-[60px] lg:text-[68px]">
             <span className="block">
               Consigue clientes en Reddit
-              <span className="ml-3 inline-grid h-[0.82em] w-[0.82em] place-items-center rounded-full bg-[#FF4500] align-baseline shadow-[0_8px_20px_rgba(255,69,0,0.35)]">
-                <IconReddit className="h-[0.48em] w-[0.48em] text-white" />
-              </span>
+              <img
+                src="/reddit-icon.png"
+                alt=""
+                aria-hidden="true"
+                className="ml-3 inline-block h-[0.82em] w-[0.82em] align-baseline object-contain drop-shadow-[0_8px_20px_rgba(255,69,0,0.35)]"
+              />
             </span>
             <span className="block">
               <mark className="box-decoration-clone rounded-[0.16em] bg-[#FFCDBF] px-[0.18em] pb-[0.06em] text-ink">
@@ -169,7 +166,7 @@ export function Landing({ onAuth }: LandingProps) {
             </button>
           </form>
 
-          <p className="mt-4 text-sm text-ink-muted">Sin tarjeta. Solo tu email y la URL de tu producto.</p>
+          <p className="mt-4 text-sm text-ink-soft">Sin tarjeta. Solo tu email y la URL de tu producto.</p>
         </div>
       </section>
 

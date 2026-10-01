@@ -53,4 +53,43 @@
   .pill {
     @apply inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium;
   }
+
+  /* Fondo de la portada: la foto cubre toda la sección. */
+  .hero-photo {
+    background-color: #dce9f0;
+    background-image: url('/hero-landscape.webp');
+    background-size: cover;
+    background-position: center 32%;
+    background-repeat: no-repeat;
+  }
+
+  /* Velo claro sobre la foto. El titular va en ink (#171717) y el subtítulo y la
+     nota en ink-soft (#3F3F46): con estos velos ambos pasan WCAG AA (>= 4.5:1)
+     tanto en móvil como en escritorio. En móvil el bloque de texto llega más
+     abajo en proporción, así que el velo se alarga. */
+  .hero-veil {
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.72) 0%,
+      rgba(255, 255, 255, 0.62) 14%,
+      rgba(255, 255, 255, 0.58) 45%,
+      rgba(255, 253, 248, 0.5) 62%,
+      rgba(255, 247, 238, 0.22) 78%,
+      rgba(255, 247, 238, 0) 92%
+    );
+  }
+
+  @media (max-width: 640px) {
+    .hero-veil {
+      background: linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.76) 0%,
+        rgba(255, 255, 255, 0.68) 18%,
+        rgba(255, 255, 255, 0.64) 52%,
+        rgba(255, 253, 248, 0.56) 72%,
+        rgba(255, 247, 238, 0.26) 86%,
+        rgba(255, 247, 238, 0) 97%
+      );
+    }
+  }
 }
