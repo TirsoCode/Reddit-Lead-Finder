@@ -2,6 +2,7 @@ import { NavLink } from 'react-router-dom';
 import { cx } from '../lib/format';
 import { IconClose, IconDashboard, IconLogout } from './icons';
 import { Logo } from './Logo';
+import { ThemeToggle } from './ThemeToggle';
 
 export interface NavItem {
   to: string;
@@ -27,14 +28,14 @@ export function Sidebar({ items, email, onSignOut, mobileOpen, onCloseMobile }: 
           type="button"
           aria-label="Cerrar menú"
           onClick={onCloseMobile}
-          className="fixed inset-0 z-30 bg-ink/25 lg:hidden"
+          className="fixed inset-0 z-30 bg-ink/40 lg:hidden dark:bg-black/60"
         />
       )}
 
       <aside
         className={cx(
           'fixed inset-y-0 left-0 z-40 flex w-[248px] flex-col border-r border-surface-line bg-white',
-          'transition-transform duration-200 lg:translate-x-0',
+          'transition-transform duration-200 lg:translate-x-0 dark:border-neutral-800 dark:bg-neutral-900',
           mobileOpen ? 'translate-x-0' : '-translate-x-full',
         )}
       >
@@ -61,8 +62,8 @@ export function Sidebar({ items, email, onSignOut, mobileOpen, onCloseMobile }: 
                 cx(
                   'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition',
                   isActive
-                    ? 'bg-brand-50 text-brand-700'
-                    : 'text-ink-muted hover:bg-surface-subtle hover:text-ink',
+                    ? 'bg-brand-50 text-brand-700 dark:bg-brand-500/15 dark:text-brand-200'
+                    : 'text-ink-muted hover:bg-surface-subtle hover:text-ink dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-neutral-100',
                 )
               }
             >
@@ -74,7 +75,9 @@ export function Sidebar({ items, email, onSignOut, mobileOpen, onCloseMobile }: 
                     <span
                       className={cx(
                         'rounded-full px-1.5 py-0.5 text-[11px] font-semibold',
-                        isActive ? 'bg-brand-100 text-brand-700' : 'bg-surface-muted text-ink-soft',
+                        isActive
+                          ? 'bg-brand-100 text-brand-700 dark:bg-brand-500/25 dark:text-brand-100'
+                          : 'bg-surface-muted text-ink-soft dark:bg-neutral-800 dark:text-neutral-300',
                       )}
                     >
                       {item.badge}
@@ -86,16 +89,19 @@ export function Sidebar({ items, email, onSignOut, mobileOpen, onCloseMobile }: 
           ))}
         </nav>
 
-        <div className="border-t border-surface-line p-3">
-          {email && <p className="truncate px-2.5 pb-2 text-xs text-ink-muted">{email}</p>}
-          <button
-            type="button"
-            onClick={onSignOut}
-            className="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm font-medium text-ink-muted transition hover:bg-surface-muted hover:text-ink"
-          >
-            <IconLogout className="h-[17px] w-[17px]" />
-            Cerrar sesión
-          </button>
+        <div className="border-t border-surface-line p-3 dark:border-neutral-800">
+          {email && <p className="truncate px-2.5 pb-2 text-xs text-ink-muted dark:text-neutral-400">{email}</p>}
+          <div className="flex items-center gap-1">
+            <button
+              type="button"
+              onClick={onSignOut}
+              className="flex flex-1 items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm font-medium text-ink-muted transition hover:bg-surface-muted hover:text-ink dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-neutral-100"
+            >
+              <IconLogout className="h-[17px] w-[17px]" />
+              Cerrar sesión
+            </button>
+            <ThemeToggle />
+          </div>
         </div>
       </aside>
     </>

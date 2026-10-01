@@ -1,4 +1,4 @@
-import { env } from '../env.js';
+import { env, isPlaceholderSecret } from '../env.js';
 import { HttpError } from '../errors.js';
 import { createLogger } from '../logger.js';
 
@@ -68,6 +68,15 @@ export function extractJson<T>(raw: string): T {
 export async function chat(options: ChatOptions): Promise<ChatResponse> {
   const model = options.model ?? env.OPENROUTER_MODEL;
 
+  // Con la clave de ejemplo del `.env.example` OpenRouter devuelve un 401 sin
+  // explicar nada útil. Se corta aquí con un mensaje que sí dice qué hacer.
+  if (isPlaceholderSecret(env.OPENROUTER_API_KEY)) {
+    throw HttpError.upstream(
+      'La IA no está configurada: falta una clave real de OpenRouter (OPENROUTER_API_KEY en .env).',
+      'placeholder-key',
+    );
+  }
+
   const body: Record<string, unknown> = {
     model,
     messages: options.messages,
@@ -104,6 +113,14 @@ export async function chat(options: ChatOptions): Promise<ChatResponse> {
           `OpenRouter respondió ${response.status} (intento ${attempt}/${MAX_ATTEMPTS})`,
           detail.slice(0, 400),
         );
+
+        // Una clave inválida no mejora reintentando.
+        if (response.status === 401 || response.status === 403) {
+          throw HttpError.invalidCredentials(
+            'La clave de OpenRouter no es válida. Revisa OPENROUTER_API_KEY en .env.',
+            detail.slice(0, 400),
+          );
+        }
 
         if (retryable && attempt < MAX_ATTEMPTS) {
           await sleep(800 * 2 ** (attempt - 1));
@@ -178,4 +195,93 @@ export async function chatJson<T>(
   }
 
   throw HttpError.upstream('La IA no devolvió una respuesta válida.', lastInvalid);
+}
+
+/* ============================================================================
+   Estado de la conexión con la IA
+   ============================================================================ */
+
+export type AiStatus = 'ready' | 'unconfigured' | 'invalid_key' | 'unreachable' | 'error';
+
+export interface AiHealth {
+  status: AiStatus;
+  /** Explicación en español, lista para mostrar en la interfaz. */
+  message: string;
+  provider: string;
+  model: string;
+  scoringModel: string;
+  /** `true` cuando la clave es la de ejemplo del `.env.example`. */
+  placeholderKey: boolean;
+  /** Respuesta real del modelo o detalle del error de OpenRouter. */
+  detail?: string;
+}
+
+/**
+ * Comprueba contra OpenRouter si la clave y el modelo responden de verdad.
+ *
+ * Hace una petición mínima (pide una respuesta de una sola palabra) en lugar de
+ * fiarte de que la variable existe: así el usuario sabe si la IA está conectada
+ * antes de analizar su web y se sorprende al recibir el error.
+ */
+export async function checkAiHealth(): Promise<AiHealth> {
+  const base = {
+    provider: 'OpenRouter',
+    model: env.OPENROUTER_MODEL,
+    scoringModel: env.scoringModel,
+    placeholderKey: isPlaceholderSecret(env.OPENROUTER_API_KEY),
+  };
+
+  if (base.placeholderKey) {
+    return {
+      ...base,
+      status: 'unconfigured',
+      message:
+        'Falta la clave de OpenRouter. Copia .env.example a .env y pon tu clave real en OPENROUTER_API_KEY.',
+    };
+  }
+
+  try {
+    const { content } = await chat({
+      model: env.OPENROUTER_MODEL,
+      temperature: 0,
+      maxTokens: 16,
+      messages: [{ role: 'user', content: 'Responde únicamente con la palabra: listo' }],
+    });
+
+    return {
+      ...base,
+      status: 'ready',
+      message: `La IA responde correctamente con ${env.OPENROUTER_MODEL}.`,
+      detail: content.trim().slice(0, 80),
+    };
+  } catch (error) {
+    const detail = error instanceof HttpError ? error.details : undefined;
+    const code = error instanceof HttpError ? error.code : null;
+
+    // Una clave rechazada (401/403) es un problema de configuración, no de red.
+    if (code === 'invalid_credentials') {
+      return {
+        ...base,
+        status: 'invalid_key',
+        message:
+          error instanceof Error
+            ? error.message
+            : 'OpenRouter rechazó la clave. Revisa OPENROUTER_API_KEY en .env.',
+        detail: typeof detail === 'string' ? detail.slice(0, 300) : undefined,
+      };
+    }
+
+    const networkIssue = error instanceof HttpError && error.status === 502;
+
+    return {
+      ...base,
+      status: networkIssue ? 'unreachable' : 'error',
+      message: networkIssue
+        ? 'No se pudo contactar con OpenRouter. Revisa la conexión, la cuota de la clave y vuelve a intentarlo.'
+        : error instanceof Error
+          ? error.message
+          : 'Error desconocido al conectar con la IA.',
+      detail: typeof detail === 'string' ? detail.slice(0, 300) : undefined,
+    };
+  }
 }

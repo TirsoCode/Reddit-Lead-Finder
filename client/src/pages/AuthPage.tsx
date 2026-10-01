@@ -74,13 +74,13 @@ export function AuthPage({ onBack }: AuthPageProps) {
 
   if (!isAuthConfigured) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-white px-5">
+      <div className="flex min-h-screen items-center justify-center bg-white px-5 dark:bg-neutral-950">
         <div className="card max-w-md p-7 text-center">
-          <h1 className="font-display text-xl font-bold text-ink">Falta configuración</h1>
-          <p className="mt-3 text-sm leading-relaxed text-ink-muted">
-            Añade <code className="rounded bg-surface-muted px-1.5 py-0.5">VITE_SUPABASE_URL</code> y{' '}
-            <code className="rounded bg-surface-muted px-1.5 py-0.5">VITE_SUPABASE_ANON_KEY</code> a tu
-            archivo <code className="rounded bg-surface-muted px-1.5 py-0.5">.env</code> y reinicia la
+          <h1 className="font-display text-xl font-bold text-ink dark:text-neutral-100">Falta configuración</h1>
+          <p className="mt-3 text-sm leading-relaxed text-ink-muted dark:text-neutral-400">
+            Añade <code className="rounded bg-surface-muted dark:bg-neutral-800 px-1.5 py-0.5">VITE_SUPABASE_URL</code> y{' '}
+            <code className="rounded bg-surface-muted dark:bg-neutral-800 px-1.5 py-0.5">VITE_SUPABASE_ANON_KEY</code> a tu
+            archivo <code className="rounded bg-surface-muted dark:bg-neutral-800 px-1.5 py-0.5">.env</code> y reinicia la
             aplicación.
           </p>        </div>
       </div>
@@ -88,7 +88,7 @@ export function AuthPage({ onBack }: AuthPageProps) {
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white dark:bg-neutral-950">
       <div className="mx-auto grid min-h-screen max-w-6xl lg:grid-cols-2">
         {/* Formulario */}
         <div className="flex items-center justify-center px-5 py-12 sm:px-10">
@@ -97,7 +97,7 @@ export function AuthPage({ onBack }: AuthPageProps) {
               <button
                 type="button"
                 onClick={onBack}
-                className="btn-ghost mb-7 -ml-2 px-2 text-[13px] text-ink-muted"
+                className="btn-ghost mb-7 -ml-2 px-2 text-[13px] text-ink-muted dark:text-neutral-400"
               >
                 <IconArrowLeft className="h-4 w-4" />
                 Volver
@@ -108,10 +108,10 @@ export function AuthPage({ onBack }: AuthPageProps) {
               <Logo />
             </div>
 
-            <h1 className="font-display text-[26px] font-bold leading-tight tracking-tight text-ink">
+            <h1 className="font-display text-[26px] font-bold leading-tight tracking-tight text-ink dark:text-neutral-100">
               {mode === 'signup' ? 'Crea tu cuenta gratis' : 'Entra en tu cuenta'}
             </h1>
-            <p className="mt-2 text-sm text-ink-muted">
+            <p className="mt-2 text-sm text-ink-muted dark:text-neutral-400">
               {mode === 'signup'
                 ? 'Sin invitaciones ni tarjeta. Solo necesitas la URL de tu producto.'
                 : 'Vuelve a ver los posts donde puede estar tu próximo cliente.'}
@@ -151,12 +151,12 @@ export function AuthPage({ onBack }: AuthPageProps) {
               </div>
 
               {error ? (
-                <p role="alert" className="rounded-lg bg-brand-50 px-3.5 py-2.5 text-sm text-brand-800">
+                <p role="alert" className="rounded-lg bg-brand-50 dark:bg-brand-500/15 px-3.5 py-2.5 text-sm text-brand-800 dark:text-brand-300">
                   {error}
                 </p>
               ) : null}
               {notice ? (
-                <p className="rounded-lg bg-surface-muted px-3.5 py-2.5 text-sm text-ink-soft">
+                <p className="rounded-lg bg-surface-muted dark:bg-neutral-800 px-3.5 py-2.5 text-sm text-ink-soft dark:text-neutral-300">
                   {notice}
                 </p>
               ) : null}
@@ -169,12 +169,12 @@ export function AuthPage({ onBack }: AuthPageProps) {
 
             <div className="my-5 flex items-center gap-3">
               <span className="h-px flex-1 bg-surface-line" />
-              <span className="text-xs uppercase tracking-wide text-ink-faint">o</span>
+              <span className="text-xs uppercase tracking-wide text-ink-faint dark:text-neutral-500">o</span>
               <span className="h-px flex-1 bg-surface-line" />
             </div>
 
             {useDevAuth ? (
-              <p className="rounded-lg bg-surface-muted px-3.5 py-2.5 text-center text-xs text-ink-soft">
+              <p className="rounded-lg bg-surface-muted dark:bg-neutral-800 px-3.5 py-2.5 text-center text-xs text-ink-soft dark:text-neutral-300">
                 Modo local: la autenticación la sirve el propio backend (Supabase está desactivado
                 con <code>DEV_AUTH=true</code>).
               </p>
@@ -190,12 +190,12 @@ export function AuthPage({ onBack }: AuthPageProps) {
               </button>
             )}
 
-            <p className="mt-6 text-center text-sm text-ink-muted">
+            <p className="mt-6 text-center text-sm text-ink-muted dark:text-neutral-400">
               {mode === 'signup' ? '¿Ya tienes cuenta?' : '¿Todavía no tienes cuenta?'}{' '}
               <button
                 type="button"
                 onClick={() => setMode(mode === 'signup' ? 'login' : 'signup')}
-                className="font-medium text-brand-600 underline-offset-2 hover:underline"
+                className="font-medium text-brand-600 dark:text-brand-400 underline-offset-2 hover:underline"
               >
                 {mode === 'signup' ? 'Inicia sesión' : 'Regístrate gratis'}
               </button>

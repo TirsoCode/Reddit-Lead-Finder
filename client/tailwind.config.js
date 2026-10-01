@@ -6,6 +6,7 @@ const here = fileURLToPath(new URL('.', import.meta.url));
 export default {
   // Rutas absolutas: el escaneo funciona igual se ejecute desde la raíz del repo
   // o desde client/.
+  darkMode: 'class',
   content: [`${here}index.html`, `${here}src/**/*.{ts,tsx}`],
   theme: {
     extend: {

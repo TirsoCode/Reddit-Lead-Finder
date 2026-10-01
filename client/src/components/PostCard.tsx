@@ -78,7 +78,7 @@ export function PostCard({
   }
 
   return (
-    <article className="card group p-4 transition hover:border-ink-faint/60">
+    <article className="card group p-4 transition hover:border-ink-faint/60 dark:hover:border-neutral-600">
       <div className="flex gap-4">
         <ScoreBadge score={lead.relevance} />
 
@@ -90,15 +90,15 @@ export function PostCard({
             rel="noopener noreferrer"
             className="focus-ring group/link inline-flex items-start gap-1.5 rounded-sm"
           >
-            <h3 className="line-clamp-2 text-[15px] font-medium leading-snug text-ink group-hover/link:text-brand-600">
+            <h3 className="line-clamp-2 text-[15px] font-medium leading-snug text-ink group-hover/link:text-brand-600 dark:text-neutral-100 dark:group-hover/link:text-brand-400">
               {lead.title}
             </h3>
-            <IconExternal className="mt-1 h-3.5 w-3.5 shrink-0 text-ink-faint opacity-0 transition group-hover/link:opacity-100" />
+            <IconExternal className="mt-1 h-3.5 w-3.5 shrink-0 text-ink-faint opacity-0 transition group-hover/link:opacity-100 dark:text-neutral-500" />
           </a>
 
           {/* Metadatos */}
-          <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-ink-muted">
-            <span className="font-medium text-ink-soft">r/{lead.subreddit}</span>
+          <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-ink-muted dark:text-neutral-400">
+            <span className="font-medium text-ink-soft dark:text-neutral-300">r/{lead.subreddit}</span>
             <span className="inline-flex items-center gap-1">
               <IconUpvote className="h-3.5 w-3.5" />
               {compactNumber(lead.upvotes)}
@@ -112,9 +112,9 @@ export function PostCard({
               <span
                 className={cx(
                   'pill',
-                  lead.status === 'saved' && 'bg-brand-50 text-brand-700',
-                  lead.status === 'replied' && 'bg-emerald-50 text-emerald-700',
-                  lead.status === 'dismissed' && 'bg-surface-muted text-ink-muted',
+                  lead.status === 'saved' && 'bg-brand-50 text-brand-700 dark:bg-brand-500/15 dark:text-brand-300',
+                  lead.status === 'replied' && 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-400',
+                  lead.status === 'dismissed' && 'bg-surface-muted text-ink-muted dark:bg-neutral-800 dark:text-neutral-400',
                 )}
               >
                 {lead.status === 'saved' ? 'Guardado' : lead.status === 'replied' ? 'Respondido' : 'Descartado'}
@@ -123,8 +123,8 @@ export function PostCard({
           </div>
 
           {lead.relevance_reason && (
-            <p className="mt-2 text-[13px] leading-relaxed text-ink-muted">
-              <span className="font-medium text-ink-soft">Por qué: </span>
+            <p className="mt-2 text-[13px] leading-relaxed text-ink-muted dark:text-neutral-400">
+              <span className="font-medium text-ink-soft dark:text-neutral-300">Por qué: </span>
               {lead.relevance_reason}
             </p>
           )}
@@ -137,20 +137,20 @@ export function PostCard({
                   type="button"
                   onClick={() => setReplyOpen((open) => !open)}
                   aria-expanded={replyOpen}
-                  className="focus-ring inline-flex items-center gap-1.5 rounded-sm text-xs font-medium text-brand-700"
+                  className="focus-ring inline-flex items-center gap-1.5 rounded-sm text-xs font-medium text-brand-700 dark:text-brand-400"
                 >
                   <IconSparkle className="h-3.5 w-3.5" />
                   {replyOpen ? 'Ocultar respuesta sugerida' : 'Ver respuesta sugerida'}
                   {lead.reply_tone ? (
-                    <span className="font-normal text-ink-faint">
+                    <span className="font-normal text-ink-faint dark:text-neutral-500">
                       · {TONE_LABELS[lead.reply_tone] ?? ''}
                     </span>
                   ) : null}
                 </button>
 
                 {replyOpen && (
-                  <div className="mt-2 rounded-lg border border-surface-line bg-surface-subtle p-3.5">
-                    <p className="whitespace-pre-line text-[13.5px] leading-relaxed text-ink-soft">
+                  <div className="mt-2 rounded-lg border border-surface-line bg-surface-subtle p-3.5 dark:border-neutral-800 dark:bg-neutral-950">
+                    <p className="whitespace-pre-line text-[13.5px] leading-relaxed text-ink-soft dark:text-neutral-300">
                       {lead.reply}
                     </p>
 
@@ -209,14 +209,14 @@ export function PostCard({
           </div>
 
           {/* Acciones de gestión */}
-          <div className="mt-3 flex items-center gap-1 border-t border-surface-line pt-2.5 opacity-0 transition group-hover:opacity-100 focus-within:opacity-100">
+          <div className="mt-3 flex items-center gap-1 border-t border-surface-line pt-2.5 opacity-0 transition group-hover:opacity-100 focus-within:opacity-100 dark:border-neutral-800">
             <button
               type="button"
               onClick={() => handleStatus(lead.status === 'saved' ? 'new' : 'saved')}
               disabled={busy !== null}
               className={cx(
                 'btn-ghost px-2 py-1 text-xs',
-                lead.status === 'saved' && 'bg-brand-50 text-brand-700',
+                lead.status === 'saved' && 'bg-brand-50 text-brand-700 dark:bg-brand-500/15 dark:text-brand-300',
               )}
               title={lead.status === 'saved' ? 'Quitar de guardados' : 'Guardar'}
             >
@@ -262,7 +262,7 @@ export function PostCard({
               }}
               disabled={busy !== null}
               aria-label="Eliminar post"
-              className="btn-ghost ml-auto px-2 py-1 text-xs text-ink-faint hover:text-brand-600"
+              className="btn-ghost ml-auto px-2 py-1 text-xs text-ink-faint hover:text-brand-600 dark:text-neutral-500 dark:hover:text-brand-400"
             >
               <IconTrash className="h-3.5 w-3.5" />
             </button>

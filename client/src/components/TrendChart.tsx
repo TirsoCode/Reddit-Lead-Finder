@@ -22,7 +22,7 @@ export function TrendChart({ data }: TrendChartProps) {
   const plotHeight = height - padding.top - padding.bottom;
 
   if (data.length === 0) {
-    return <p className="py-10 text-center text-sm text-ink-muted">Todavía no hay datos.</p>;
+    return <p className="py-10 text-center text-sm text-ink-muted dark:text-neutral-400">Todavía no hay datos.</p>;
   }
 
   const max = Math.max(1, ...data.map((point) => point.count));
@@ -65,14 +65,14 @@ export function TrendChart({ data }: TrendChartProps) {
                 x2={width - padding.right}
                 y1={y}
                 y2={y}
-                className="stroke-surface-line"
+                className="stroke-surface-line dark:stroke-neutral-800"
                 strokeWidth={1}
               />
               <text
                 x={padding.left - 8}
                 y={y + 3.5}
                 textAnchor="end"
-                className="fill-ink-faint text-[10px]"
+                className="fill-ink-faint text-[10px] dark:fill-neutral-500"
               >
                 {tick}
               </text>
@@ -97,7 +97,8 @@ export function TrendChart({ data }: TrendChartProps) {
             cx={point.x}
             cy={point.y}
             r={point.count > 0 ? 2.6 : 1.6}
-            fill={point.count > 0 ? '#E63946' : '#D4D4D8'}
+            fill={point.count > 0 ? '#E63946' : 'currentColor'}
+            className={point.count > 0 ? undefined : 'text-[#D4D4D8] dark:text-neutral-700'}
           >
             <title>
               {`${formatDate(point.day)}: ${point.count} ${
@@ -114,7 +115,7 @@ export function TrendChart({ data }: TrendChartProps) {
               x={point.x}
               y={height - 6}
               textAnchor="middle"
-              className="fill-ink-faint text-[10px]"
+              className="fill-ink-faint text-[10px] dark:fill-neutral-500"
             >
               {formatDate(point.day)}
             </text>

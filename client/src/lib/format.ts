@@ -49,11 +49,11 @@ export function compactNumber(value: number): string {
 
 /** Colorea la puntuación: rojo = oportunidad, gris = poco relevante. */
 export function relevanceTone(relevance: number | null): string {
-  if (relevance === null) return 'bg-surface-muted text-ink-faint';
+  if (relevance === null) return 'bg-surface-muted text-ink-faint dark:bg-neutral-800 dark:text-neutral-400';
   if (relevance >= 80) return 'bg-brand-500 text-white';
-  if (relevance >= 60) return 'bg-brand-100 text-brand-700';
-  if (relevance >= 40) return 'bg-surface-muted text-ink-soft';
-  return 'bg-surface-subtle text-ink-faint';
+  if (relevance >= 60) return 'bg-brand-100 text-brand-700 dark:bg-brand-500/25 dark:text-brand-200';
+  if (relevance >= 40) return 'bg-surface-muted text-ink-soft dark:bg-neutral-800 dark:text-neutral-300';
+  return 'bg-surface-subtle text-ink-faint dark:bg-neutral-900 dark:text-neutral-500';
 }
 
 export function cx(...values: Array<string | false | null | undefined>): string {

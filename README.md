@@ -77,10 +77,23 @@ El modelo por defecto es `google/gemini-2.5-flash-lite`, pero puedes cambiarlo c
 `OPENROUTER_MODEL` (y `OPENROUTER_SCORING_MODEL` si quieres uno más potente solo para puntuar y
 redactar).
 
+**Cómo se comprueba que está conectada:** entra en **Perfil → Conexión con la IA** y pulsa
+*Comprobar ahora*. La web llama de verdad a OpenRouter (no solo mira que la variable exista) y te
+dice si la clave responde, si le falta o si se quedó sin cuota. Sin clave real, el arranque del
+servidor avisa por consola y el análisis de la web falla con un mensaje claro en vez de un error
+genérico.
+
 ### 4. Variables de entorno
 
 Copia `.env.example` a `.env` y rellénalo. En producción deja siempre `DEV_AUTH=false` para que la
 autenticación la lleve Supabase.
+
+## Tema claro y oscuro
+
+La web viene con los dos modos. El botón de sol/luna está en la barra lateral, en la cabecera móvil
+y en la portada. La primera visita respeta el tema del sistema operativo y, cuando eliges uno a mano,
+se recuerda en el navegador (`localStorage`). No hay parpadeo al cargar: la clase se aplica antes de
+montar React.
 
 ## Scripts
 
@@ -103,7 +116,7 @@ client/            Frontend React
   src/components/  Sidebar, PostCard, Stats, TrendChart, iconos…
   src/lib/         api.ts (cliente HTTP), auth.ts, format.ts
 server/
-  routes/          /api/profile, /api/leads, /api/stats, /api/health
+  routes/          /api/profile, /api/leads, /api/stats, /api/ai, /api/health
   services/        pipeline, analyze, reddit, scoring, replies, scheduler
   repositories/    acceso a datos (profiles, leads, scan_runs)
   db.ts            doble driver: PostgreSQL o PGlite

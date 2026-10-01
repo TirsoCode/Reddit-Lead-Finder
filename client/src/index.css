@@ -9,7 +9,11 @@
   }
 
   body {
-    @apply bg-white text-ink font-sans;
+    @apply bg-white text-ink font-sans transition-colors duration-300;
+  }
+
+  html.dark body {
+    @apply bg-neutral-950 text-neutral-100;
   }
 
   ::selection {
@@ -19,11 +23,11 @@
 
 @layer components {
   .focus-ring {
-    @apply outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white;
+    @apply outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-neutral-950;
   }
 
   .card {
-    @apply rounded-xl border border-surface-line bg-white shadow-card;
+    @apply rounded-xl border border-surface-line bg-white shadow-card dark:border-neutral-800 dark:bg-neutral-900;
   }
 
   .btn {
@@ -35,19 +39,19 @@
   }
 
   .btn-secondary {
-    @apply btn border border-surface-line bg-white px-4 py-2.5 text-ink hover:bg-surface-subtle;
+    @apply btn border border-surface-line bg-white px-4 py-2.5 text-ink hover:bg-surface-subtle dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:hover:bg-neutral-800;
   }
 
   .btn-ghost {
-    @apply btn px-3 py-2 text-ink-muted hover:bg-surface-muted hover:text-ink;
+    @apply btn px-3 py-2 text-ink-muted hover:bg-surface-muted hover:text-ink dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-neutral-100;
   }
 
   .input {
-    @apply focus-ring w-full rounded-lg border border-surface-line bg-white px-3.5 py-2.5 text-sm text-ink placeholder:text-ink-faint hover:border-ink-faint focus:border-brand-500;
+    @apply focus-ring w-full rounded-lg border border-surface-line bg-white px-3.5 py-2.5 text-sm text-ink placeholder:text-ink-faint hover:border-ink-faint focus:border-brand-500 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:placeholder:text-neutral-500;
   }
 
   .label {
-    @apply mb-1.5 block text-sm font-medium text-ink-soft;
+    @apply mb-1.5 block text-sm font-medium text-ink-soft dark:text-neutral-300;
   }
 
   .pill {
@@ -89,6 +93,38 @@
         rgba(255, 253, 248, 0.56) 72%,
         rgba(255, 247, 238, 0.26) 86%,
         rgba(255, 247, 238, 0) 97%
+      );
+    }
+  }
+
+  /* En modo oscuro el velo se invierte: la foto se apaga para que el titular
+     (blanco) mantenga el contraste sin dejar la imagen encendida. */
+  .dark .hero-photo {
+    filter: brightness(0.5) saturate(0.85);
+  }
+
+  .dark .hero-veil {
+    background: linear-gradient(
+      180deg,
+      rgba(9, 9, 11, 0.78) 0%,
+      rgba(9, 9, 11, 0.66) 16%,
+      rgba(9, 9, 11, 0.56) 46%,
+      rgba(12, 10, 14, 0.44) 64%,
+      rgba(20, 14, 12, 0.24) 80%,
+      rgba(23, 23, 23, 0) 94%
+    );
+  }
+
+  @media (max-width: 640px) {
+    .dark .hero-veil {
+      background: linear-gradient(
+        180deg,
+        rgba(9, 9, 11, 0.82) 0%,
+        rgba(9, 9, 11, 0.72) 20%,
+        rgba(9, 9, 11, 0.64) 54%,
+        rgba(12, 10, 14, 0.52) 74%,
+        rgba(20, 14, 12, 0.24) 88%,
+        rgba(23, 23, 23, 0) 98%
       );
     }
   }

@@ -193,10 +193,10 @@ export function LeadsPage({ pendingReplies, onProfileChange }: LeadsPageProps) {
     <div className="space-y-6">
       <header className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <h1 className="font-display text-2xl font-bold tracking-tight text-ink sm:text-[28px]">
+          <h1 className="font-display text-2xl font-bold tracking-tight text-ink dark:text-white sm:text-[28px]">
             Leads
           </h1>
-          <p className="mt-1.5 text-sm text-ink-muted">
+          <p className="mt-1.5 text-sm text-ink-muted dark:text-neutral-400">
             Posts de Reddit donde tu producto puede encajar, con la respuesta ya escrita en español.
           </p>
         </div>
@@ -219,7 +219,7 @@ export function LeadsPage({ pendingReplies, onProfileChange }: LeadsPageProps) {
 
       {/* Filtros */}
       <div className="card flex flex-wrap items-center gap-3 p-3">
-        <div className="flex rounded-lg bg-surface-muted p-0.5">
+        <div className="flex rounded-lg bg-surface-muted dark:bg-neutral-800 p-0.5">
           {FILTERS.map((filter) => (
             <button
               key={filter.value}
@@ -228,7 +228,7 @@ export function LeadsPage({ pendingReplies, onProfileChange }: LeadsPageProps) {
               className={cx(
                 'focus-ring rounded-[7px] px-3 py-1.5 text-[13px] font-medium transition',
                 status === filter.value
-                  ? 'bg-white text-ink shadow-card'
+                  ? 'bg-white text-ink shadow-card dark:bg-neutral-700 dark:text-white'
                   : 'text-ink-muted hover:text-ink',
               )}
             >
@@ -238,7 +238,7 @@ export function LeadsPage({ pendingReplies, onProfileChange }: LeadsPageProps) {
         </div>
 
         <div className="relative min-w-[180px] flex-1">
-          <IconSearch className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-faint" />
+          <IconSearch className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-faint dark:text-neutral-500" />
           <input
             value={searchInput}
             onChange={(event) => setSearchInput(event.target.value)}
@@ -254,6 +254,7 @@ export function LeadsPage({ pendingReplies, onProfileChange }: LeadsPageProps) {
           aria-label="Ordenar por"
           className="input w-auto py-2 pr-8"
         >
+          {/* Los options necesitan fondo explícito en modo oscuro */}
           {SORTS.map((option) => (
             <option key={option.value} value={option.value}>
               {option.label}
@@ -276,13 +277,13 @@ export function LeadsPage({ pendingReplies, onProfileChange }: LeadsPageProps) {
       </div>
 
       {notice ? (
-        <p className="rounded-lg border border-surface-line bg-surface-subtle px-4 py-3 text-sm text-ink-soft">
+        <p className="rounded-lg border border-surface-line dark:border-neutral-800 bg-surface-subtle dark:bg-neutral-900 px-4 py-3 text-sm text-ink-soft dark:text-neutral-300">
           {notice}
         </p>
       ) : null}
       {error ? <ErrorNote message={error} onRetry={() => void load()} /> : null}
 
-      <p className="text-xs text-ink-faint">{loading ? 'Cargando…' : rangeLabel}</p>
+      <p className="text-xs text-ink-faint dark:text-neutral-500">{loading ? 'Cargando…' : rangeLabel}</p>
 
       {loading ? (
         <CardSkeleton rows={5} />
@@ -337,7 +338,7 @@ export function LeadsPage({ pendingReplies, onProfileChange }: LeadsPageProps) {
           >
             Anteriores
           </button>
-          <span className="text-sm text-ink-muted">
+          <span className="text-sm text-ink-muted dark:text-neutral-400">
             Página {page + 1} de {totalPages}
           </span>
           <button

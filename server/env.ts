@@ -88,3 +88,51 @@ export const env = {
 } as const;
 
 export type Env = typeof env;
+
+/**
+ * Las claves de ejemplo empiezan por `pon-`. Con ellas el arranque funciona
+ * (para no bloquear el desarrollo local) pero cualquier llamada a la IA o a
+ * Reddit falla con un 401, así que avisamos por consola desde el principio.
+ */
+const PLACEHOLDER_PREFIX = 'pon-';
+
+export function isPlaceholderSecret(value: string): boolean {
+  const trimmed = value.trim().toLowerCase();
+  return (
+    trimmed.startsWith(PLACEHOLDER_PREFIX) ||
+    trimmed.startsWith('tu_') ||
+    trimmed === 'changeme' ||
+    trimmed.length === 0
+  );
+}
+
+/** Resumen de qué servicios externos están configurados de verdad. */
+export function describeIntegrations(): Array<{ name: string; ready: boolean; detail: string }> {
+  // Con DEV_AUTH la autenticación la sirve el propio backend, así que Supabase
+  // no es necesario y no debe aparecer como algo que falta.
+  const supabaseReady = usingSupabaseAuth()
+    ? raw.SUPABASE_URL.startsWith('https://') && !isPlaceholderSecret(raw.SUPABASE_ANON_KEY)
+    : true;
+
+  return [
+    {
+      name: 'openrouter',
+      ready: !isPlaceholderSecret(raw.OPENROUTER_API_KEY),
+      detail: `IA · ${raw.OPENROUTER_MODEL}`,
+    },
+    {
+      name: 'reddit',
+      ready: !isPlaceholderSecret(raw.REDDIT_CLIENT_ID) && !isPlaceholderSecret(raw.REDDIT_CLIENT_SECRET),
+      detail: `API oficial · ${raw.REDDIT_WINDOW_HOURS} h de ventana`,
+    },
+    {
+      name: 'supabase',
+      ready: supabaseReady,
+      detail: usingSupabaseAuth() ? 'Autenticación activa' : 'Usando el login local (DEV_AUTH)',
+    },
+  ];
+}
+
+function usingSupabaseAuth(): boolean {
+  return !raw.DEV_AUTH;
+}

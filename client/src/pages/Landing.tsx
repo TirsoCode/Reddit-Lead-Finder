@@ -6,11 +6,11 @@ import {
   IconCopy,
   IconEye,
   IconPencil,
-  IconReddit,
   IconSearch,
   IconShield,
 } from '../components/icons';
 import { LogoMark } from '../components/Logo';
+import { ThemeToggle } from '../components/ThemeToggle';
 import { copyToClipboard, cx, relevanceTone } from '../lib/format';
 
 interface LandingProps {
@@ -288,46 +288,47 @@ export function Landing({ onAuth }: LandingProps) {
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white dark:bg-neutral-950">
       {/* ---------- Cabecera ---------- */}
-      <header className="sticky top-0 z-30 border-b border-[#F2E4D8] bg-[#FFF7F0]/85 backdrop-blur-md">
-        <div className="mx-auto flex h-16 max-w-[1120px] items-center justify-between px-5 sm:px-8">
+      <header className="sticky top-0 z-30 border-b border-[#F2E4D8] bg-[#FFF7F0]/85 backdrop-blur-md dark:border-neutral-800 dark:bg-neutral-900/85">
+        <div className="mx-auto flex h-16 max-w-[1440px] items-center justify-between px-5 sm:px-8">
           <span className="flex items-center gap-2.5">
             <LogoMark className="h-7 w-7" />
-            <span className="font-display text-[15px] font-bold tracking-tight text-ink">
+            <span className="font-display text-[15px] font-bold tracking-tight text-ink dark:text-neutral-100">
               Reddit<span className="text-brand-500">Leads</span>
             </span>
           </span>
 
           <nav className="hidden items-center gap-7 md:flex xl:gap-8">
-            <a href="#problema" className="text-sm text-ink-muted transition hover:text-ink">
+            <a href="#problema" className="text-sm text-ink-muted transition hover:text-ink dark:text-neutral-400 dark:hover:text-neutral-100">
               El problema
             </a>
-            <a href="#como" className="text-sm text-ink-muted transition hover:text-ink">
+            <a href="#como" className="text-sm text-ink-muted transition hover:text-ink dark:text-neutral-400 dark:hover:text-neutral-100">
               Cómo funciona
             </a>
-            <a href="#cola" className="text-sm text-ink-muted transition hover:text-ink">
+            <a href="#cola" className="text-sm text-ink-muted transition hover:text-ink dark:text-neutral-400 dark:hover:text-neutral-100">
               La cola de hoy
             </a>
-            <a href="#nota" className="text-sm text-ink-muted transition hover:text-ink">
+            <a href="#nota" className="text-sm text-ink-muted transition hover:text-ink dark:text-neutral-400 dark:hover:text-neutral-100">
               La nota
             </a>
-            <a href="#dia" className="text-sm text-ink-muted transition hover:text-ink">
+            <a href="#dia" className="text-sm text-ink-muted transition hover:text-ink dark:text-neutral-400 dark:hover:text-neutral-100">
               Un día
             </a>
-            <a href="#para-quien" className="text-sm text-ink-muted transition hover:text-ink">
+            <a href="#para-quien" className="text-sm text-ink-muted transition hover:text-ink dark:text-neutral-400 dark:hover:text-neutral-100">
               Para quién es
             </a>
-            <a href="#faq" className="text-sm text-ink-muted transition hover:text-ink">
+            <a href="#faq" className="text-sm text-ink-muted transition hover:text-ink dark:text-neutral-400 dark:hover:text-neutral-100">
               Preguntas
             </a>
           </nav>
 
           <div className="flex items-center gap-1 sm:gap-3">
+            <ThemeToggle />
             <button
               type="button"
               onClick={onAuth}
-              className="focus-ring rounded-lg px-3 py-2 text-sm font-medium text-ink-soft transition hover:text-ink"
+              className="focus-ring rounded-lg px-3 py-2 text-sm font-medium text-ink-soft transition hover:text-ink dark:text-neutral-300 dark:hover:text-neutral-100"
             >
               Entrar
             </button>
@@ -339,39 +340,35 @@ export function Landing({ onAuth }: LandingProps) {
       </header>
 
       {/* ---------- Frase principal ---------- */}
-      <section className="relative isolate overflow-hidden bg-[#DCE9F0]">
+      <section className="relative isolate overflow-hidden bg-[#DCE9F0] dark:bg-neutral-950">
         {/* fondo: la imagen a todo el ancho */}
         <div aria-hidden="true" className="hero-photo absolute inset-0" />
 
         {/* velo claro: mantiene el titular legible y funde la foto con la página */}
         <div aria-hidden="true" className="hero-veil absolute inset-0" />
 
-        <div className="relative z-10 mx-auto max-w-[1120px] px-5 pb-[300px] pt-14 text-center sm:px-8 sm:pt-20 sm:pb-[44vh]">
-          <h1 className="mx-auto max-w-4xl font-display text-[36px] font-bold leading-[1.06] tracking-[-0.035em] text-ink sm:text-[60px] lg:text-[68px]">
+        <div className="relative z-10 mx-auto max-w-[1440px] px-5 pb-[300px] pt-16 text-center sm:px-8 sm:pt-24 sm:pb-[44vh]">
+          <span className="pill border border-[#F2E4D8] bg-white/70 text-[12.5px] font-semibold text-ink-soft backdrop-blur dark:border-neutral-700 dark:bg-neutral-900/70 dark:text-neutral-200">
+            Dos barridos al día · Respuestas en español · Las publicas tú
+          </span>
+
+          <h1 className="mx-auto mt-6 max-w-5xl font-display text-[38px] font-bold leading-[1.06] tracking-[-0.035em] text-ink sm:text-[64px] lg:text-[76px] dark:text-white">
+            <span className="block">Consigue clientes en Reddit</span>
             <span className="block">
-              Consigue clientes en Reddit
-              <img
-                src="/reddit-icon.png"
-                alt=""
-                aria-hidden="true"
-                className="ml-3 inline-block h-[0.82em] w-[0.82em] align-baseline object-contain drop-shadow-[0_8px_20px_rgba(255,69,0,0.35)]"
-              />
-            </span>
-            <span className="block">
-              <mark className="box-decoration-clone rounded-[0.16em] bg-[#FFCDBF] px-[0.18em] pb-[0.06em] text-ink">
+              <mark className="box-decoration-clone rounded-[0.16em] bg-[#FFCDBF] px-[0.18em] pb-[0.06em] text-ink dark:bg-[#7F1820] dark:text-[#FFE4DB]">
                 gratis y fácil
               </mark>
             </span>
           </h1>
 
-          <p className="mx-auto mt-6 max-w-2xl text-[16px] leading-relaxed text-ink-soft sm:text-[18px]">
+          <p className="mx-auto mt-7 max-w-3xl text-[17px] leading-relaxed text-ink-soft sm:text-[19px] dark:text-neutral-300">
             RedditLeads lee tu web, encuentra las conversaciones donde alguien tiene tu problema,
             las puntúa del 1 al 100 y te redacta la respuesta en español. Tú solo copias y pegas.
           </p>
 
           <form
             onSubmit={handleFind}
-            className="mx-auto mt-8 flex w-full max-w-[640px] flex-col gap-2 rounded-3xl bg-white p-2 shadow-pop ring-1 ring-black/[0.06] sm:flex-row sm:items-center sm:rounded-full"
+            className="mx-auto mt-9 flex w-full max-w-[720px] flex-col gap-2 rounded-3xl bg-white p-2 shadow-pop ring-1 ring-black/[0.06] dark:bg-neutral-900 dark:ring-white/10 sm:flex-row sm:items-center sm:rounded-full"
           >
             <input
               type="text"
@@ -380,11 +377,11 @@ export function Landing({ onAuth }: LandingProps) {
               onChange={(event) => setProductUrl(event.target.value)}
               placeholder="tuproducto.com"
               aria-label="URL de tu producto"
-              className="focus-ring min-w-0 flex-1 rounded-2xl border-0 bg-transparent px-4 py-3 text-[15px] text-ink placeholder:text-ink-faint sm:rounded-full"
+              className="focus-ring min-w-0 flex-1 rounded-2xl border-0 bg-transparent px-4 py-3.5 text-[16px] text-ink placeholder:text-ink-faint dark:text-white dark:placeholder:text-neutral-500 sm:rounded-full"
             />
             <button
               type="submit"
-              className="btn-primary shrink-0 gap-2 whitespace-nowrap rounded-2xl px-5 py-3 text-[15px] font-semibold sm:rounded-full"
+              className="btn-primary shrink-0 gap-2 whitespace-nowrap rounded-2xl px-6 py-3.5 text-[15px] font-semibold sm:rounded-full"
             >
               Encuentra mi primer lead
               <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2.2}>
@@ -393,25 +390,50 @@ export function Landing({ onAuth }: LandingProps) {
             </button>
           </form>
 
-          <p className="mt-4 text-sm text-ink-soft">Sin tarjeta. Solo tu email y la URL de tu producto.</p>
+          <p className="mt-4 text-sm text-ink-soft dark:text-neutral-400">
+            Sin tarjeta. Solo tu email y la URL de tu producto.
+          </p>
+
+          {/* Muestra de lo que sale del barrido, sin entrar en la app. */}
+          <ul className="mx-auto mt-12 grid max-w-[980px] gap-3 text-left sm:grid-cols-3">
+            {[
+              { title: 'Encuentra el hilo', body: 'Detecta el problema en tus palabras y le da una nota de 0 a 100.' },
+              { title: 'Lee la comunidad', body: 'Te avisa de las normas de ese subreddit antes de que respondas.' },
+              { title: 'Escribe la respuesta', body: 'Un borrador en tu tono, con su frase citada. Tú lo apruebas.' },
+            ].map((item) => (
+              <li
+                key={item.title}
+                className="rounded-2xl border border-white/70 bg-white/70 p-5 backdrop-blur dark:border-neutral-700/70 dark:bg-neutral-900/60"
+              >
+                <h2 className="font-display text-[16px] font-semibold tracking-tight text-ink dark:text-neutral-100">
+                  {item.title}
+                </h2>
+                <p className="mt-2 text-[14px] leading-relaxed text-ink-muted dark:text-neutral-400">
+                  {item.body}
+                </p>
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
 
       {/* ---------- Los tres avisos ---------- */}
-      <section id="seguridad" className="border-t border-[#F2E4D8] bg-[#FFF9F4]">
-        <div className="mx-auto max-w-[1120px] px-5 py-12 sm:px-8">
-          <div className="grid gap-px overflow-hidden rounded-2xl border border-[#F2E4D8] bg-[#F2E4D8] sm:grid-cols-3">
+      <section id="seguridad" className="border-t border-[#F2E4D8] bg-[#FFF9F4] dark:border-neutral-800 dark:bg-neutral-900">
+        <div className="mx-auto max-w-[1440px] px-5 py-14 sm:px-8">
+          <div className="grid gap-px overflow-hidden rounded-2xl border border-[#F2E4D8] bg-[#F2E4D8] sm:grid-cols-3 dark:border-neutral-800 dark:bg-neutral-800">
             {TRUST.map((item) => {
               const TrustIcon = item.icon;
               return (
-                <div key={item.title} className="bg-white p-6">
-                  <span className="grid h-10 w-10 place-items-center rounded-xl bg-brand-50 text-brand-600">
+                <div key={item.title} className="bg-white p-7 dark:bg-neutral-900">
+                  <span className="grid h-10 w-10 place-items-center rounded-xl bg-brand-50 text-brand-600 dark:bg-brand-500/15 dark:text-brand-300">
                     <TrustIcon className="h-5 w-5" />
                   </span>
-                  <h3 className="mt-4 font-display text-[16px] font-semibold tracking-tight text-ink">
+                  <h3 className="mt-4 font-display text-[17px] font-semibold tracking-tight text-ink dark:text-neutral-100">
                     {item.title}
                   </h3>
-                  <p className="mt-2 text-[14px] leading-relaxed text-ink-muted">{item.body}</p>
+                  <p className="mt-2 text-[14.5px] leading-relaxed text-ink-muted dark:text-neutral-400">
+                    {item.body}
+                  </p>
                 </div>
               );
             })}
@@ -420,28 +442,28 @@ export function Landing({ onAuth }: LandingProps) {
       </section>
 
       {/* ---------- El problema: a mano vs. en la cola ---------- */}
-      <section id="problema" className="border-t border-surface-line bg-white">
-        <div className="mx-auto max-w-[1120px] px-5 py-20 sm:px-8">
-          <div className="max-w-2xl">
-            <h2 className="font-display text-[28px] font-bold leading-tight tracking-tight text-ink sm:text-[32px]">
+      <section id="problema" className="border-t border-surface-line bg-white dark:border-neutral-800 dark:bg-neutral-950">
+        <div className="mx-auto max-w-[1440px] px-5 py-24 sm:px-8">
+          <div className="max-w-3xl">
+            <h2 className="font-display text-[30px] font-bold leading-tight tracking-tight text-ink sm:text-[38px] dark:text-white">
               Rastrear el problema a mano es una faena
             </h2>
-            <p className="mt-5 text-[15px] leading-relaxed text-ink-muted">
+            <p className="mt-6 text-[16px] leading-relaxed text-ink-muted dark:text-neutral-400">
               Nadie se levanta a buscar lo que le duele a su cliente cada día. Se hace de vez en
               cuando, a ratos, y se abandona. Lo que hace RedditLeads es exactamente ese trabajo, cada
               día, sin que tengas que acordarte.
             </p>
           </div>
 
-          <div className="mt-12 grid gap-4 lg:grid-cols-2 lg:gap-6">
-            <article className="rounded-2xl border border-surface-line bg-white p-6 sm:p-7">
-              <h3 className="font-display text-[17px] font-bold tracking-tight text-ink-muted">
+          <div className="mt-14 grid gap-5 lg:grid-cols-2 lg:gap-6">
+            <article className="rounded-2xl border border-surface-line bg-white p-7 sm:p-8 dark:border-neutral-800 dark:bg-neutral-900">
+              <h3 className="font-display text-[18px] font-bold tracking-tight text-ink-muted dark:text-neutral-400">
                 A mano
               </h3>
-              <ul className="mt-5 space-y-4">
+              <ul className="mt-6 space-y-4">
                 {A_MANO.map((item, index) => (
-                  <li key={item} className="flex gap-3.5 text-[14.5px] leading-relaxed text-ink-muted">
-                    <span className="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full bg-surface-muted text-[12px] font-bold text-ink-faint">
+                  <li key={item} className="flex gap-3.5 text-[15px] leading-relaxed text-ink-muted dark:text-neutral-400">
+                    <span className="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full bg-surface-muted text-[12px] font-bold text-ink-faint dark:bg-neutral-800 dark:text-neutral-500">
                       {index + 1}
                     </span>
                     {item}
@@ -450,14 +472,13 @@ export function Landing({ onAuth }: LandingProps) {
               </ul>
             </article>
 
-            <article className="rounded-2xl border border-brand-200 bg-brand-50/60 p-6 shadow-card sm:p-7">
-              <h3 className="flex items-center gap-2 font-display text-[17px] font-bold tracking-tight text-ink">
-                <IconReddit className="h-4 w-4 text-brand-500" />
+            <article className="rounded-2xl border border-brand-200 bg-brand-50/60 p-7 shadow-card sm:p-8 dark:border-brand-500/40 dark:bg-brand-500/10">
+              <h3 className="font-display text-[18px] font-bold tracking-tight text-ink dark:text-white">
                 Con RedditLeads
               </h3>
-              <ul className="mt-5 space-y-4">
+              <ul className="mt-6 space-y-4">
                 {CON_LA_APP.map((item) => (
-                  <li key={item} className="flex gap-3.5 text-[14.5px] leading-relaxed text-ink-soft">
+                  <li key={item} className="flex gap-3.5 text-[15px] leading-relaxed text-ink-soft dark:text-neutral-200">
                     <span className="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full bg-brand-500 text-[12px] font-bold text-white">
                       <IconCheck className="h-3.5 w-3.5" />
                     </span>
@@ -471,38 +492,38 @@ export function Landing({ onAuth }: LandingProps) {
       </section>
 
       {/* ---------- Pasos, con sus maquetas ---------- */}
-      <section id="como" className="border-t border-surface-line bg-white">
-        <div className="mx-auto max-w-[1120px] px-5 py-20 sm:px-8">
-          <div className="max-w-xl">
-            <h2 className="font-display text-[28px] font-bold leading-tight tracking-tight text-ink sm:text-[32px]">
+      <section id="como" className="border-t border-surface-line bg-white dark:border-neutral-800 dark:bg-neutral-950">
+        <div className="mx-auto max-w-[1440px] px-5 py-24 sm:px-8">
+          <div className="max-w-2xl">
+            <h2 className="font-display text-[30px] font-bold leading-tight tracking-tight text-ink sm:text-[38px] dark:text-white">
               Qué hace, paso a paso
             </h2>
-            <p className="mt-5 text-[15px] leading-relaxed text-ink-muted">
+            <p className="mt-6 text-[16px] leading-relaxed text-ink-muted dark:text-neutral-400">
               De una URL a una conversación en la que puedes responder hoy mismo.
             </p>
           </div>
 
-          <div className="mt-12 space-y-6">
+          <div className="mt-14 space-y-6">
             {STEPS.map((step, index) => {
               const StepIcon = step.icon;
               return (
-                <article key={step.title} className="overflow-hidden rounded-2xl border border-surface-line bg-white shadow-card">
-                  <header className="flex items-center justify-between gap-4 border-b border-surface-line px-5 py-5 sm:px-7">
-                    <span className="flex items-center gap-3.5">
-                      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-ink text-white">
-                        <StepIcon className="h-[18px] w-[18px]" />
+                <article key={step.title} className="overflow-hidden rounded-2xl border border-surface-line bg-white shadow-card dark:border-neutral-800 dark:bg-neutral-900">
+                  <header className="flex items-center justify-between gap-4 border-b border-surface-line px-6 py-6 sm:px-8 dark:border-neutral-800">
+                    <span className="flex items-center gap-4">
+                      <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-ink text-white dark:bg-neutral-100 dark:text-neutral-900">
+                        <StepIcon className="h-[19px] w-[19px]" />
                       </span>
-                      <h3 className="font-display text-[19px] font-bold tracking-tight text-ink sm:text-[21px]">
+                      <h3 className="font-display text-[20px] font-bold tracking-tight text-ink sm:text-[23px] dark:text-white">
                         {step.title}
                       </h3>
                     </span>
-                    <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-ink-faint">
+                    <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-ink-faint dark:text-neutral-500">
                       Paso {index + 1}
                     </span>
                   </header>
 
-                  <div className="grid gap-7 px-5 py-6 sm:px-7 md:grid-cols-2 md:items-center">
-                    <p className="text-[15px] leading-relaxed text-ink-muted">{step.body}</p>
+                  <div className="grid gap-8 px-6 py-7 sm:px-8 md:grid-cols-2 md:items-center">
+                    <p className="text-[16px] leading-relaxed text-ink-muted dark:text-neutral-400">{step.body}</p>
                     {index === 0 ? <FeedMockup /> : index === 1 ? <DraftMockup /> : <QueueMockup />}
                   </div>
                 </article>
@@ -513,18 +534,18 @@ export function Landing({ onAuth }: LandingProps) {
       </section>
 
       {/* ---------- La cola de hoy, interactiva ---------- */}
-      <section id="cola" className="border-t border-[#F2E4D8] bg-[#FFF9F4]">
-        <div className="mx-auto max-w-[1120px] px-5 py-20 sm:px-8">
+      <section id="cola" className="border-t border-[#F2E4D8] bg-[#FFF9F4] dark:border-neutral-800 dark:bg-neutral-900">
+        <div className="mx-auto max-w-[1440px] px-5 py-24 sm:px-8">
           <div className="max-w-3xl">
-            <h2 className="font-display text-[28px] font-bold leading-tight tracking-tight text-ink sm:text-[32px]">
+            <h2 className="font-display text-[30px] font-bold leading-tight tracking-tight text-ink sm:text-[38px] dark:text-white">
               La cola de hoy
             </h2>
-            <p className="mt-5 text-[15px] leading-relaxed text-ink-muted">
+            <p className="mt-6 text-[16px] leading-relaxed text-ink-muted dark:text-neutral-400">
               Dos veces al día el barrido vuelve con los posts donde alguien describe el problema que
               resuelves. Cada uno se puntúa del 0 al 100 con la frase que lo ganó, se contrasta con lo
               que esa comunidad permite y llega con la respuesta escrita antes de que lo abras.
             </p>
-            <p className="mt-4 text-[15px] leading-relaxed text-ink-muted">
+            <p className="mt-4 text-[16px] leading-relaxed text-ink-muted dark:text-neutral-400">
               Abre cualquiera de los cuatro de abajo para ver todo eso en un solo lead.
             </p>
           </div>
@@ -534,72 +555,74 @@ export function Landing({ onAuth }: LandingProps) {
       </section>
 
       {/* ---------- La nota, explicada ---------- */}
-      <section id="nota" className="border-t border-[#F2E4D8] bg-white">
-        <div className="mx-auto max-w-[1120px] px-5 py-20 sm:px-8">
-          <div className="max-w-2xl">
-            <h2 className="font-display text-[28px] font-bold leading-tight tracking-tight text-ink sm:text-[32px]">
+      <section id="nota" className="border-t border-[#F2E4D8] bg-white dark:border-neutral-800 dark:bg-neutral-950">
+        <div className="mx-auto max-w-[1440px] px-5 py-24 sm:px-8">
+          <div className="max-w-3xl">
+            <h2 className="font-display text-[30px] font-bold leading-tight tracking-tight text-ink sm:text-[38px] dark:text-white">
               Qué significa la nota
             </h2>
-            <p className="mt-5 text-[15px] leading-relaxed text-ink-muted">
+            <p className="mt-6 text-[16px] leading-relaxed text-ink-muted dark:text-neutral-400">
               La nota no la pone una persona, y no es un adivino: es el resultado de comparar el
               post con lo que realmente vendes. Cada lead te enseña la frase exacta por la que
               subió, para que decidas con criterio y no con fe.
             </p>
           </div>
 
-          <div className="mt-12 grid gap-px overflow-hidden rounded-2xl border border-surface-line bg-surface-line sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-14 grid gap-px overflow-hidden rounded-2xl border border-surface-line bg-surface-line sm:grid-cols-2 lg:grid-cols-4 dark:border-neutral-800 dark:bg-neutral-800">
             {SCORE_BANDS.map((band) => (
-              <div key={band.range} className="bg-white p-6">
+              <div key={band.range} className="bg-white p-7 dark:bg-neutral-900">
                 <span className="flex items-center gap-2.5">
                   <span className={cx('h-2.5 w-2.5 rounded-full', band.swatch)} />
-                  <span className="font-display text-[15px] font-bold tracking-tight text-ink">
+                  <span className="font-display text-[16px] font-bold tracking-tight text-ink dark:text-neutral-100">
                     {band.range}
                   </span>
                 </span>
-                <h3 className="mt-4 font-display text-[15.5px] font-semibold tracking-tight text-ink">
+                <h3 className="mt-4 font-display text-[16.5px] font-semibold tracking-tight text-ink dark:text-neutral-100">
                   {band.title}
                 </h3>
-                <p className="mt-2 text-[13.5px] leading-relaxed text-ink-muted">{band.body}</p>
+                <p className="mt-2 text-[14px] leading-relaxed text-ink-muted dark:text-neutral-400">
+                  {band.body}
+                </p>
               </div>
             ))}
           </div>
 
-          <p className="mt-6 text-[14px] text-ink-faint">
+          <p className="mt-7 text-[14.5px] text-ink-faint dark:text-neutral-500">
             Por debajo de 50 lo tratamos como ruido, así que no te roba tiempo ni te llena la cola.
           </p>
         </div>
       </section>
 
       {/* ---------- Un día con la app ---------- */}
-      <section id="dia" className="border-t border-[#F2E4D8] bg-[#FFF9F4]">
-        <div className="mx-auto max-w-[1120px] px-5 py-20 sm:px-8">
-          <div className="max-w-2xl">
-            <h2 className="font-display text-[28px] font-bold leading-tight tracking-tight text-ink sm:text-[32px]">
+      <section id="dia" className="border-t border-[#F2E4D8] bg-[#FFF9F4] dark:border-neutral-800 dark:bg-neutral-900">
+        <div className="mx-auto max-w-[1440px] px-5 py-24 sm:px-8">
+          <div className="max-w-3xl">
+            <h2 className="font-display text-[30px] font-bold leading-tight tracking-tight text-ink sm:text-[38px] dark:text-white">
               Un día con la app
             </h2>
-            <p className="mt-5 text-[15px] leading-relaxed text-ink-muted">
+            <p className="mt-6 text-[16px] leading-relaxed text-ink-muted dark:text-neutral-400">
               Son dos barridos al día. Tú solo abres la cola, lees los que puntúan alto y decides a
               quién quieres responder.
             </p>
           </div>
 
-          <ol className="mt-12 space-y-0">
+          <ol className="mt-14 space-y-0">
             {DAY.map((moment, index) => (
-              <li key={moment.time} className="relative flex gap-5 pb-8 last:pb-0 sm:gap-7">
+              <li key={moment.time} className="relative flex gap-6 pb-9 last:pb-0 sm:gap-8">
                 {index < DAY.length - 1 ? (
                   <span
                     aria-hidden="true"
-                    className="absolute left-[19px] top-10 h-full w-px bg-[#F2E4D8] sm:left-[23px]"
+                    className="absolute left-[19px] top-10 h-full w-px bg-[#F2E4D8] dark:bg-neutral-700 sm:left-[23px]"
                   />
                 ) : null}
                 <span className="relative z-10 grid h-10 w-10 shrink-0 place-items-center rounded-full bg-brand-500 text-[11px] font-bold text-white sm:h-12 sm:w-12 sm:text-[12px]">
                   {moment.time}
                 </span>
                 <div className="pt-0.5">
-                  <h3 className="font-display text-[17px] font-bold tracking-tight text-ink sm:text-[18px]">
+                  <h3 className="font-display text-[18px] font-bold tracking-tight text-ink sm:text-[19px] dark:text-white">
                     {moment.title}
                   </h3>
-                  <p className="mt-2 max-w-2xl text-[14.5px] leading-relaxed text-ink-muted">
+                  <p className="mt-2 max-w-2xl text-[15px] leading-relaxed text-ink-muted dark:text-neutral-400">
                     {moment.body}
                   </p>
                 </div>
@@ -610,28 +633,28 @@ export function Landing({ onAuth }: LandingProps) {
       </section>
 
       {/* ---------- Para quién es ---------- */}
-      <section id="para-quien" className="border-t border-surface-line bg-white">
-        <div className="mx-auto max-w-[1120px] px-5 py-20 sm:px-8">
-          <div className="max-w-2xl">
-            <h2 className="font-display text-[28px] font-bold leading-tight tracking-tight text-ink sm:text-[32px]">
+      <section id="para-quien" className="border-t border-surface-line bg-white dark:border-neutral-800 dark:bg-neutral-950">
+        <div className="mx-auto max-w-[1440px] px-5 py-24 sm:px-8">
+          <div className="max-w-3xl">
+            <h2 className="font-display text-[30px] font-bold leading-tight tracking-tight text-ink sm:text-[38px] dark:text-white">
               Para quién es, y para quién no
             </h2>
-            <p className="mt-5 text-[15px] leading-relaxed text-ink-muted">
+            <p className="mt-6 text-[16px] leading-relaxed text-ink-muted dark:text-neutral-400">
               Preferimos que sepas si esto te sirve antes de que te registres.
             </p>
           </div>
 
-          <div className="mt-12 grid gap-4 lg:grid-cols-2 lg:gap-6">
-            <article className="rounded-2xl border border-surface-line bg-white p-6 sm:p-7">
-              <h3 className="flex items-center gap-2.5 font-display text-[17px] font-bold tracking-tight text-ink">
-                <span className="grid h-8 w-8 place-items-center rounded-lg bg-brand-50 text-brand-600">
+          <div className="mt-14 grid gap-5 lg:grid-cols-2 lg:gap-6">
+            <article className="rounded-2xl border border-surface-line bg-white p-7 sm:p-8 dark:border-neutral-800 dark:bg-neutral-900">
+              <h3 className="flex items-center gap-3 font-display text-[18px] font-bold tracking-tight text-ink dark:text-white">
+                <span className="grid h-8 w-8 place-items-center rounded-lg bg-brand-50 text-brand-600 dark:bg-brand-500/15 dark:text-brand-300">
                   <IconCheck className="h-4 w-4" />
                 </span>
                 Te sirve si…
               </h3>
               <ul className="mt-6 space-y-4">
                 {PARA_QUE_SI.map((item) => (
-                  <li key={item} className="flex gap-3.5 text-[14.5px] leading-relaxed text-ink-soft">
+                  <li key={item} className="flex gap-3.5 text-[15px] leading-relaxed text-ink-soft dark:text-neutral-300">
                     <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-500" />
                     {item}
                   </li>
@@ -639,17 +662,17 @@ export function Landing({ onAuth }: LandingProps) {
               </ul>
             </article>
 
-            <article className="rounded-2xl border border-surface-line bg-surface-subtle p-6 sm:p-7">
-              <h3 className="flex items-center gap-2.5 font-display text-[17px] font-bold tracking-tight text-ink">
-                <span className="grid h-8 w-8 place-items-center rounded-lg bg-surface-muted text-ink-faint">
+            <article className="rounded-2xl border border-surface-line bg-surface-subtle p-7 sm:p-8 dark:border-neutral-800 dark:bg-neutral-900">
+              <h3 className="flex items-center gap-3 font-display text-[18px] font-bold tracking-tight text-ink dark:text-white">
+                <span className="grid h-8 w-8 place-items-center rounded-lg bg-surface-muted text-ink-faint dark:bg-neutral-800 dark:text-neutral-500">
                   <IconClose className="h-4 w-4" />
                 </span>
                 No te sirve si…
               </h3>
               <ul className="mt-6 space-y-4">
                 {PARA_QUE_NO.map((item) => (
-                  <li key={item} className="flex gap-3.5 text-[14.5px] leading-relaxed text-ink-muted">
-                    <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-ink-faint" />
+                  <li key={item} className="flex gap-3.5 text-[15px] leading-relaxed text-ink-muted dark:text-neutral-400">
+                    <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-ink-faint dark:bg-neutral-600" />
                     {item}
                   </li>
                 ))}
@@ -660,13 +683,13 @@ export function Landing({ onAuth }: LandingProps) {
       </section>
 
       {/* ---------- Preguntas frecuentes ---------- */}
-      <section id="faq" className="border-t border-[#F2E4D8] bg-white">
-        <div className="mx-auto max-w-[820px] px-5 py-20 sm:px-8">
-          <h2 className="font-display text-[28px] font-bold leading-tight tracking-tight text-ink sm:text-[32px]">
+      <section id="faq" className="border-t border-[#F2E4D8] bg-white dark:border-neutral-800 dark:bg-neutral-950">
+        <div className="mx-auto max-w-[900px] px-5 py-24 sm:px-8">
+          <h2 className="font-display text-[30px] font-bold leading-tight tracking-tight text-ink sm:text-[38px] dark:text-white">
             Preguntas frecuentes
           </h2>
 
-          <div className="mt-10 divide-y divide-surface-line border-y border-surface-line">
+          <div className="mt-11 divide-y divide-surface-line border-y border-surface-line dark:divide-neutral-800 dark:border-neutral-800">
             {FAQS.map((faq, index) => {
               const open = openFaq === index;
               return (
@@ -675,13 +698,13 @@ export function Landing({ onAuth }: LandingProps) {
                     type="button"
                     onClick={() => setOpenFaq(open ? null : index)}
                     aria-expanded={open}
-                    className="flex w-full items-center justify-between gap-6 py-5 text-left"
+                    className="flex w-full items-center justify-between gap-6 py-6 text-left"
                   >
-                    <span className="font-display text-[16px] font-semibold tracking-tight text-ink">
+                    <span className="font-display text-[17px] font-semibold tracking-tight text-ink dark:text-neutral-100">
                       {faq.q}
                     </span>
                     <span
-                      className={`grid h-6 w-6 shrink-0 place-items-center text-ink-faint transition-transform ${
+                      className={`grid h-6 w-6 shrink-0 place-items-center text-ink-faint transition-transform dark:text-neutral-500 ${
                         open ? 'rotate-45' : ''
                       }`}
                     >
@@ -691,7 +714,7 @@ export function Landing({ onAuth }: LandingProps) {
                     </span>
                   </button>
                   {open ? (
-                    <p className="animate-fade-up pb-5 pr-10 text-[15px] leading-relaxed text-ink-muted">
+                    <p className="animate-fade-up pb-5 pr-10 text-[15.5px] leading-relaxed text-ink-muted dark:text-neutral-400">
                       {faq.a}
                     </p>
                   ) : null}
@@ -703,24 +726,24 @@ export function Landing({ onAuth }: LandingProps) {
       </section>
 
       {/* ---------- Cierre ---------- */}
-      <section className="border-t border-[#F2E4D8] bg-[linear-gradient(180deg,#FFFFFF_0%,#FFF1E6_100%)]">
-        <div className="mx-auto max-w-[1120px] px-5 py-20 text-center sm:px-8">
-          <h2 className="mx-auto max-w-2xl font-display text-[28px] font-bold leading-tight tracking-tight text-ink sm:text-[34px]">
+      <section className="border-t border-[#F2E4D8] bg-[linear-gradient(180deg,#FFFFFF_0%,#FFF1E6_100%)] dark:border-neutral-800 dark:bg-[linear-gradient(180deg,#0A0A0B_0%,#241812_100%)]">
+        <div className="mx-auto max-w-[1440px] px-5 py-24 text-center sm:px-8">
+          <h2 className="mx-auto max-w-3xl font-display text-[30px] font-bold leading-tight tracking-tight text-ink sm:text-[40px] dark:text-white">
             Empieza a leer lo que se dice de tu problema
           </h2>
-          <button type="button" onClick={onAuth} className="btn-primary mt-8 px-6 py-3">
+          <button type="button" onClick={onAuth} className="btn-primary mt-9 px-7 py-3.5 text-[15px]">
             Encuentra mi primer lead
           </button>
         </div>
       </section>
 
-      <footer className="border-t border-surface-line">
-        <div className="mx-auto flex max-w-[1120px] flex-col items-center justify-between gap-3 px-5 py-8 sm:flex-row sm:px-8">
-          <span className="flex items-center gap-2 text-sm text-ink-faint">
+      <footer className="border-t border-surface-line dark:border-neutral-800">
+        <div className="mx-auto flex max-w-[1440px] flex-col items-center justify-between gap-3 px-5 py-9 sm:flex-row sm:px-8">
+          <span className="flex items-center gap-2 text-sm text-ink-faint dark:text-neutral-400">
             <LogoMark className="h-6 w-6" />
             RedditLeads
           </span>
-          <p className="text-xs text-ink-faint">
+          <p className="text-xs text-ink-faint dark:text-neutral-500">
             No afiliado con Reddit. Respuestas en español para que publiques tú.
           </p>
         </div>
@@ -736,24 +759,29 @@ export function Landing({ onAuth }: LandingProps) {
 /** Paso 1: los hilos recién encontrados, con su nota. */
 function FeedMockup() {
   return (
-    <div className="rounded-xl border border-surface-line bg-white p-3">
-      <p className="px-1 pb-2.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-ink-faint">
+    <div className="rounded-xl border border-surface-line bg-white p-4 dark:border-neutral-800 dark:bg-neutral-950">
+      <p className="px-1 pb-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-ink-faint dark:text-neutral-500">
         Barrido · 8:00
       </p>
       <ul className="space-y-2">
         {MINI_FEED.map((row) => (
-          <li key={row.sub} className="flex items-start gap-3 rounded-lg bg-surface-subtle px-3 py-2.5">
+          <li
+            key={row.sub}
+            className="flex items-start gap-3 rounded-lg bg-surface-subtle px-3 py-3 dark:bg-neutral-900"
+          >
             <span
               className={cx(
-                'grid h-6 w-7 shrink-0 place-items-center rounded-md text-[11px] font-bold',
+                'grid h-7 w-8 shrink-0 place-items-center rounded-md text-[11px] font-bold',
                 relevanceTone(row.score),
               )}
             >
               {row.score}
             </span>
             <span className="min-w-0">
-              <span className="block text-[11px] font-semibold text-ink-muted">{row.sub}</span>
-              <span className="block truncate text-[13px] text-ink">{row.title}</span>
+              <span className="block text-[11px] font-semibold text-ink-muted dark:text-neutral-400">
+                {row.sub}
+              </span>
+              <span className="block truncate text-[13.5px] text-ink dark:text-neutral-100">{row.title}</span>
             </span>
           </li>
         ))}
@@ -765,9 +793,9 @@ function FeedMockup() {
 /** Paso 2: el borrador escribiéndose. */
 function DraftMockup() {
   return (
-    <div className="rounded-xl border border-surface-line bg-white p-4">
-      <p className="text-[12px] text-ink-faint">Borrador · r/Shopify</p>
-      <p className="mt-2.5 text-[14px] leading-relaxed text-ink-soft">
+    <div className="rounded-xl border border-surface-line bg-white p-5 dark:border-neutral-800 dark:bg-neutral-950">
+      <p className="text-[12px] text-ink-faint dark:text-neutral-500">Borrador · r/Shopify</p>
+      <p className="mt-3 text-[14.5px] leading-relaxed text-ink-soft dark:text-neutral-300">
         Nos pasó igual con unos 40 pedidos. Lo que lo resolvió fue una sola lista compartida, con una
         columna de estado
         <span
@@ -782,26 +810,25 @@ function DraftMockup() {
 /** Paso 3: la cola aprobada, con su estado. */
 function QueueMockup() {
   return (
-    <div className="space-y-2">
+    <div className="space-y-2.5">
       {MINI_QUEUE.map((row) => {
         const ready = row.status === 'lista';
         return (
           <div
             key={row.sub}
-            className="flex items-center gap-3 rounded-xl border border-surface-line bg-white px-3.5 py-3"
+            className="flex items-center gap-3 rounded-xl border border-surface-line bg-white px-4 py-3.5 dark:border-neutral-800 dark:bg-neutral-950"
           >
-            <IconReddit className="h-4 w-4 shrink-0 text-brand-500" />
-            <p className="min-w-0 flex-1 truncate text-[13px] text-ink-soft">
-              <span className="font-semibold text-ink">{row.sub}</span> “{row.title}”
+            <p className="min-w-0 flex-1 truncate text-[13.5px] text-ink-soft dark:text-neutral-300">
+              <span className="font-semibold text-ink dark:text-neutral-100">{row.sub}</span> “{row.title}”
             </p>
             <span
               className={cx(
                 'flex shrink-0 items-center gap-1.5 text-[12px] font-medium',
-                ready ? 'text-emerald-700' : 'text-ink-faint',
+                ready ? 'text-emerald-700 dark:text-emerald-400' : 'text-ink-faint dark:text-neutral-500',
               )}
             >
               <span
-                className={cx('h-1.5 w-1.5 rounded-full', ready ? 'bg-emerald-500' : 'bg-ink-faint')}
+                className={cx('h-1.5 w-1.5 rounded-full', ready ? 'bg-emerald-500' : 'bg-ink-faint dark:bg-neutral-600')}
               />
               {row.status}
             </span>
@@ -830,18 +857,18 @@ function QueueDemo({ onAuth }: LandingProps) {
   }
 
   return (
-    <div className="mt-10 overflow-hidden rounded-2xl border border-[#F2E4D8] bg-white shadow-pop">
-      <div className="flex items-center justify-between gap-4 border-b border-surface-line px-5 py-4">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-ink-faint">
+    <div className="mt-11 overflow-hidden rounded-2xl border border-[#F2E4D8] bg-white shadow-pop dark:border-neutral-700 dark:bg-neutral-900">
+      <div className="flex items-center justify-between gap-4 border-b border-surface-line px-6 py-5 dark:border-neutral-800">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-ink-faint dark:text-neutral-500">
           La cola de hoy
         </p>
-        <p className="text-xs text-ink-faint">Barrido de las 8:00 · 4 de 12</p>
+        <p className="text-xs text-ink-faint dark:text-neutral-500">Barrido de las 8:00 · 4 de 12</p>
       </div>
 
-      <div className="grid lg:grid-cols-[330px_1fr]">
+      <div className="grid lg:grid-cols-[380px_1fr]">
         {/* Lista */}
-        <div className="border-b border-surface-line lg:border-b-0 lg:border-r">
-          <ul className="divide-y divide-surface-line">
+        <div className="border-b border-surface-line dark:border-neutral-800 lg:border-b-0 lg:border-r">
+          <ul className="divide-y divide-surface-line dark:divide-neutral-800">
             {DEMO_LEADS.map((item) => {
               const active = item.id === lead.id;
               return (
@@ -851,26 +878,27 @@ function QueueDemo({ onAuth }: LandingProps) {
                     onClick={() => setActiveId(item.id)}
                     aria-pressed={active}
                     className={cx(
-                      'focus-ring flex w-full items-start gap-3 border-l-[3px] px-5 py-4 text-left transition',
-                      active ? 'border-brand-500 bg-brand-50/70' : 'border-transparent hover:bg-surface-subtle',
+                      'focus-ring flex w-full items-start gap-3 border-l-[3px] px-6 py-5 text-left transition',
+                      active
+                        ? 'border-brand-500 bg-brand-50/70 dark:bg-brand-500/10'
+                        : 'border-transparent hover:bg-surface-subtle dark:hover:bg-neutral-800',
                     )}
                   >
                     <span className="min-w-0 flex-1">
                       <span className="flex items-center justify-between gap-2">
-                        <span className="flex items-center gap-1.5 text-[13px] font-semibold text-ink">
-                          <IconReddit className="h-3.5 w-3.5 text-brand-500" />
+                        <span className="flex items-center gap-1.5 text-[13.5px] font-semibold text-ink dark:text-neutral-100">
                           {item.sub}
                         </span>
                         <span
                           className={cx(
-                            'grid h-5 w-7 shrink-0 place-items-center rounded-md text-[11px] font-bold',
+                            'grid h-5 w-8 shrink-0 place-items-center rounded-md text-[11px] font-bold',
                             relevanceTone(item.score),
                           )}
                         >
                           {item.score}
                         </span>
                       </span>
-                      <span className="mt-1.5 line-clamp-2 block text-[14px] leading-snug text-ink-soft">
+                      <span className="mt-1.5 line-clamp-2 block text-[14.5px] leading-snug text-ink-soft dark:text-neutral-300">
                         {item.title}
                       </span>
                     </span>
@@ -879,61 +907,66 @@ function QueueDemo({ onAuth }: LandingProps) {
               );
             })}
           </ul>
-          <p className="border-t border-surface-line px-5 py-3.5 text-xs text-ink-faint">
+          <p className="border-t border-surface-line px-6 py-4 text-xs text-ink-faint dark:border-neutral-800 dark:text-neutral-500">
             4 leads nuevos · el próximo barrido llega a las 20:00.
           </p>
         </div>
 
         {/* Detalle del lead seleccionado */}
-        <div key={lead.id} className="animate-fade-up p-5 sm:p-7">
-          <p className="flex flex-wrap items-center gap-2 text-[13px] text-ink-muted">
-            <IconReddit className="h-4 w-4 text-brand-500" />
-            <span className="font-semibold text-ink">{lead.sub}</span>
-            <span className="text-ink-faint">·</span>
+        <div key={lead.id} className="animate-fade-up p-6 sm:p-8">
+          <p className="flex flex-wrap items-center gap-2 text-[13px] text-ink-muted dark:text-neutral-400">
+            <span className="font-semibold text-ink dark:text-neutral-100">{lead.sub}</span>
+            <span className="text-ink-faint dark:text-neutral-600">·</span>
             <span>{lead.user}</span>
           </p>
 
-          <h3 className="mt-3 font-display text-[20px] font-bold leading-snug tracking-tight text-ink sm:text-[22px]">
+          <h3 className="mt-3.5 font-display text-[21px] font-bold leading-snug tracking-tight text-ink sm:text-[24px] dark:text-white">
             {lead.title}
           </h3>
 
-          <p className="mt-3 text-[15px] leading-relaxed text-ink-muted">
+          <p className="mt-4 text-[15.5px] leading-relaxed text-ink-muted dark:text-neutral-400">
             <Highlighted text={lead.body} highlight={lead.highlight} />
           </p>
 
-          <div className="mt-5 grid gap-3 sm:grid-cols-2">
-            <div className="rounded-xl bg-surface-muted p-4">
-              <p className="text-[12px] font-semibold text-ink-faint">
+          <div className="mt-6 grid gap-3.5 sm:grid-cols-2">
+            <div className="rounded-xl bg-surface-muted p-5 dark:bg-neutral-800">
+              <p className="text-[12px] font-semibold text-ink-faint dark:text-neutral-500">
                 Puntuado {lead.score}/100 porque
               </p>
-              <p className="mt-1.5 text-[13.5px] leading-relaxed text-ink-soft">{lead.reason}</p>
+              <p className="mt-2 text-[14px] leading-relaxed text-ink-soft dark:text-neutral-300">
+                {lead.reason}
+              </p>
             </div>
-            <div className="rounded-xl bg-surface-muted p-4">
-              <p className="flex items-center gap-1.5 text-[12px] font-semibold text-ink-faint">
+            <div className="rounded-xl bg-surface-muted p-5 dark:bg-neutral-800">
+              <p className="flex items-center gap-1.5 text-[12px] font-semibold text-ink-faint dark:text-neutral-500">
                 <IconShield className="h-3.5 w-3.5" />
                 Normas, léelas primero
               </p>
-              <p className="mt-1.5 text-[13.5px] leading-relaxed text-ink-soft">{lead.rules}</p>
+              <p className="mt-2 text-[14px] leading-relaxed text-ink-soft dark:text-neutral-300">
+                {lead.rules}
+              </p>
             </div>
           </div>
 
-          <div className="mt-3 rounded-xl border border-surface-line p-4">
+          <div className="mt-3.5 rounded-xl border border-surface-line p-5 dark:border-neutral-800">
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <p className="flex items-center gap-2 text-[13.5px] font-semibold text-ink">
-                <IconComment className="h-4 w-4 text-ink-faint" />
+              <p className="flex items-center gap-2 text-[14px] font-semibold text-ink dark:text-neutral-100">
+                <IconComment className="h-4 w-4 text-ink-faint dark:text-neutral-500" />
                 Respuesta pública, lista
               </p>
-              <span className="text-[12px] text-ink-faint">Tuya para editar</span>
+              <span className="text-[12px] text-ink-faint dark:text-neutral-500">Tuya para editar</span>
             </div>
-            <p className="mt-3 text-[14px] leading-relaxed text-ink-soft">{lead.draft}</p>
-            <div className="mt-4 flex flex-wrap items-center gap-3">
-              <button type="button" onClick={handleCopy} className="btn-secondary px-3.5 py-2">
+            <p className="mt-3.5 text-[14.5px] leading-relaxed text-ink-soft dark:text-neutral-300">
+              {lead.draft}
+            </p>
+            <div className="mt-5 flex flex-wrap items-center gap-3">
+              <button type="button" onClick={handleCopy} className="btn-secondary px-4 py-2.5">
                 {copied ? 'Copiada ✓' : 'Copiar respuesta'}
               </button>
-              <button type="button" onClick={onAuth} className="btn-primary px-3.5 py-2">
+              <button type="button" onClick={onAuth} className="btn-primary px-4 py-2.5">
                 Quiero esto para mi producto
               </button>
-              <span className="text-[12px] text-ink-faint">La pegas tú, en tu Reddit.</span>
+              <span className="text-[12px] text-ink-faint dark:text-neutral-500">La pegas tú, en tu Reddit.</span>
             </div>
           </div>
         </div>
@@ -949,7 +982,9 @@ function Highlighted({ text, highlight }: { text: string; highlight: string }) {
   return (
     <>
       {text.slice(0, at)}
-      <mark className="box-decoration-clone rounded bg-brand-100/70 px-0.5 text-ink">{highlight}</mark>
+      <mark className="box-decoration-clone rounded bg-brand-100/70 px-0.5 text-ink dark:bg-brand-500/25 dark:text-brand-100">
+        {highlight}
+      </mark>
       {text.slice(at + highlight.length)}
     </>
   );

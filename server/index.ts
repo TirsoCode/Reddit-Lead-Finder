@@ -1,11 +1,12 @@
 import express, { type NextFunction, type Request, type Response } from 'express';
 import { pool } from './db.js';
-import { env } from './env.js';
+import { describeIntegrations, env } from './env.js';
 import { HttpError } from './errors.js';
 import { createLogger } from './logger.js';
 import { leadsRouter } from './routes/leads.js';
 import { profileRouter } from './routes/profile.js';
 import { statsRouter } from './routes/stats.js';
+import { aiRouter } from './routes/ai.js';
 import { usingDevAuth } from './auth.js';
 import { devAuthRouter } from './routes/devAuth.js';
 import { startScheduler } from './services/scheduler.js';
@@ -51,6 +52,7 @@ export function createApp() {
   app.use('/api/profile', profileRouter);
   app.use('/api/leads', leadsRouter);
   app.use('/api/stats', statsRouter);
+  app.use('/api/ai', aiRouter);
 
   app.use('/api', (_req, _res, next) => {
     next(HttpError.notFound('Ese endpoint no existe'));
@@ -87,10 +89,26 @@ export function createApp() {
   return app;
 }
 
+/**
+ * Las claves de ejemplo de `.env.example` dejan la app en marcha pero sin IA ni
+ * Reddit. Se avisa al arrancar en vez de dejar que el primer análisis falle.
+ */
+function warnMissingIntegrations(): void {
+  const missing = describeIntegrations().filter((item) => !item.ready);
+  if (missing.length === 0) return;
+
+  log.warn(
+    `Sin configurar: ${missing.map((item) => item.name).join(', ')}. ` +
+      'La app arranca, pero esas funciones fallarán hasta que pongas las claves reales en .env.',
+  );
+  for (const item of missing) log.warn(`  · ${item.name}: ${item.detail}`);
+}
+
 async function main(): Promise<void> {
   const app = createApp();
   const server = app.listen(env.PORT, () => {
     log.info(`API escuchando en ${env.APP_URL} (puerto ${env.PORT})`);
+    warnMissingIntegrations();
     startScheduler();
   });
 

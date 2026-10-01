@@ -39,4 +39,9 @@ export class HttpError extends Error {
   static upstream(message: string, details?: unknown) {
     return new HttpError(502, message, 'upstream_error', details);
   }
+
+  /** El proveedor rechazó la clave (401/403): reintentar no va a arreglarlo. */
+  static invalidCredentials(message: string, details?: unknown) {
+    return new HttpError(502, message, 'invalid_credentials', details);
+  }
 }

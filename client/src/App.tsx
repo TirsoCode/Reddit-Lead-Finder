@@ -4,6 +4,7 @@ import { useAuth } from './lib/auth';
 import { api, type Profile, type ScanRun } from './lib/api';
 import { Layout } from './components/Layout';
 import { Spinner } from './components/ui';
+import { ThemeProvider } from './hooks/useTheme';
 import { AuthPage } from './pages/AuthPage';
 import { Dashboard } from './pages/Dashboard';
 import { Landing } from './pages/Landing';
@@ -12,16 +13,24 @@ import { ProfilePage } from './pages/ProfilePage';
 
 function FullScreenLoader() {
   return (
-    <div className="grid min-h-screen place-items-center bg-white">
+    <div className="grid min-h-screen place-items-center bg-white dark:bg-neutral-950">
       <div className="flex flex-col items-center gap-3">
         <Spinner className="h-5 w-5 text-brand-500" />
-        <p className="text-sm text-ink-faint">Cargando…</p>
+        <p className="text-sm text-ink-faint dark:text-neutral-500">Cargando…</p>
       </div>
     </div>
   );
 }
 
 export function App() {
+  return (
+    <ThemeProvider>
+      <AppContent />
+    </ThemeProvider>
+  );
+}
+
+function AppContent() {
   const { session, loading, signOut } = useAuth();
   const navigate = useNavigate();
 

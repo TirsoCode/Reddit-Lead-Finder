@@ -116,13 +116,13 @@ export function Dashboard({ profile, onProfileChange, onOpenLeads }: DashboardPr
     <div className="space-y-8">
       <header className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <h1 className="font-display text-2xl font-bold tracking-tight text-ink sm:text-[28px]">
+          <h1 className="font-display text-2xl font-bold tracking-tight text-ink dark:text-white sm:text-[28px]">
             Dashboard
           </h1>
-          <p className="mt-1.5 text-sm text-ink-muted">
+          <p className="mt-1.5 text-sm text-ink-muted dark:text-neutral-400">
             {profile?.product_name ? (
               <>
-                Analizando <span className="font-medium text-ink-soft">{profile.product_name}</span>
+                Analizando <span className="font-medium text-ink-soft dark:text-neutral-300">{profile.product_name}</span>
                 {profile.analyzed_at ? ` · keywords listas ${timeAgo(profile.analyzed_at)}` : ''}
               </>
             ) : (
@@ -139,7 +139,7 @@ export function Dashboard({ profile, onProfileChange, onOpenLeads }: DashboardPr
       {needsSetup && <SetupCallToAction profile={profile} />}
 
       {notice ? (
-        <p className="rounded-lg border border-surface-line bg-surface-subtle px-4 py-3 text-sm text-ink-soft">
+        <p className="rounded-lg border border-surface-line dark:border-neutral-800 bg-surface-subtle dark:bg-neutral-900 px-4 py-3 text-sm text-ink-soft dark:text-neutral-300">
           {notice}
         </p>
       ) : null}
@@ -150,7 +150,7 @@ export function Dashboard({ profile, onProfileChange, onOpenLeads }: DashboardPr
       <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {loading ? (
           Array.from({ length: 4 }).map((_, index) => (
-            <div key={index} className="card h-[122px] animate-pulse bg-surface-subtle" />
+            <div key={index} className="card h-[122px] animate-pulse bg-surface-subtle dark:bg-neutral-900" />
           ))
         ) : (
           <>
@@ -182,13 +182,13 @@ export function Dashboard({ profile, onProfileChange, onOpenLeads }: DashboardPr
       {/* Gráfica */}
       <section className="card p-5">
         <div className="mb-4 flex items-baseline justify-between">
-          <h2 className="font-display text-base font-semibold text-ink">
+          <h2 className="font-display text-base font-semibold text-ink dark:text-neutral-100">
             Evolución de posts por día
           </h2>
-          <span className="text-xs text-ink-faint">Últimos 30 días</span>
+          <span className="text-xs text-ink-faint dark:text-neutral-500">Últimos 30 días</span>
         </div>
         {loading ? (
-          <div className="h-[190px] animate-pulse rounded-lg bg-surface-subtle" />
+          <div className="h-[190px] animate-pulse rounded-lg bg-surface-subtle dark:bg-neutral-900" />
         ) : (
           <TrendChart data={stats?.byDay ?? []} />
         )}
@@ -198,13 +198,13 @@ export function Dashboard({ profile, onProfileChange, onOpenLeads }: DashboardPr
         {/* Mejores leads */}
         <section className="space-y-3">
           <div className="flex items-center justify-between">
-            <h2 className="font-display text-base font-semibold text-ink">
+            <h2 className="font-display text-base font-semibold text-ink dark:text-neutral-100">
               Mejores oportunidades
             </h2>
             <button
               type="button"
               onClick={onOpenLeads}
-              className="text-sm font-medium text-brand-600 hover:underline"
+              className="text-sm font-medium text-brand-600 dark:text-brand-400 hover:underline"
             >
               Ver todos
             </button>
@@ -240,23 +240,23 @@ export function Dashboard({ profile, onProfileChange, onOpenLeads }: DashboardPr
         {/* Lateral */}
         <aside className="space-y-4">
           <div className="card p-5">
-            <h3 className="font-display text-sm font-semibold text-ink">Búsqueda automática</h3>
-            <p className="mt-1.5 text-[13px] leading-relaxed text-ink-muted">
+            <h3 className="font-display text-sm font-semibold text-ink dark:text-neutral-100">Búsqueda automática</h3>
+            <p className="mt-1.5 text-[13px] leading-relaxed text-ink-muted dark:text-neutral-400">
               La app busca dos veces al día, todos los días. Los posts nuevos aparecen aquí cuando
               entras, sin avisos ni correos.
             </p>
-            <p className="mt-3 text-xs text-ink-faint">Próximas ejecuciones: 08:00 y 20:00 (UTC)</p>
+            <p className="mt-3 text-xs text-ink-faint dark:text-neutral-500">Próximas ejecuciones: 08:00 y 20:00 (UTC)</p>
           </div>
 
           {stats && stats.topSubreddits.length > 0 && (
             <div className="card p-5">
-              <h3 className="font-display text-sm font-semibold text-ink">Dónde aparece tu público</h3>
+              <h3 className="font-display text-sm font-semibold text-ink dark:text-neutral-100">Dónde aparece tu público</h3>
               <ul className="mt-4 space-y-3">
                 {stats.topSubreddits.map((entry) => (
                   <li key={entry.subreddit}>
                     <div className="flex items-baseline justify-between gap-2 text-[13px]">
-                      <span className="truncate font-medium text-ink-soft">r/{entry.subreddit}</span>
-                      <span className="text-ink-faint">{entry.count}</span>
+                      <span className="truncate font-medium text-ink-soft dark:text-neutral-300">r/{entry.subreddit}</span>
+                      <span className="text-ink-faint dark:text-neutral-500">{entry.count}</span>
                     </div>
                     <ProgressBar
                       className="mt-1.5"
@@ -271,17 +271,17 @@ export function Dashboard({ profile, onProfileChange, onOpenLeads }: DashboardPr
 
           {profile?.problem && (
             <div className="card p-5">
-              <h3 className="font-display text-sm font-semibold text-ink">Tu problema, en una frase</h3>
-              <p className="mt-2 text-[13px] leading-relaxed text-ink-muted">{profile.problem}</p>
+              <h3 className="font-display text-sm font-semibold text-ink dark:text-neutral-100">Tu problema, en una frase</h3>
+              <p className="mt-2 text-[13px] leading-relaxed text-ink-muted dark:text-neutral-400">{profile.problem}</p>
               {profile.audience && (
                 <>
-                  <h3 className="mt-5 font-display text-sm font-semibold text-ink">Cliente ideal</h3>
-                  <p className="mt-2 text-[13px] leading-relaxed text-ink-muted">{profile.audience}</p>
+                  <h3 className="mt-5 font-display text-sm font-semibold text-ink dark:text-neutral-100">Cliente ideal</h3>
+                  <p className="mt-2 text-[13px] leading-relaxed text-ink-muted dark:text-neutral-400">{profile.audience}</p>
                 </>
               )}
               <Link
                 to="/perfil"
-                className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-brand-600 hover:underline"
+                className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-brand-600 dark:text-brand-400 hover:underline"
               >
                 <IconLink className="h-3.5 w-3.5" />
                 Ver keywords
@@ -304,13 +304,13 @@ function SetupCallToAction({ profile }: { profile: Profile | null }) {
   }[status ?? 'idle'];
 
   return (
-    <div className="rounded-xl border border-brand-100 bg-brand-50 p-5">
+    <div className="rounded-xl border border-brand-100 dark:border-brand-500/40 bg-brand-50 dark:bg-brand-500/15 p-5">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h2 className="font-display text-base font-semibold text-brand-900">
+          <h2 className="font-display text-base font-semibold text-brand-900 dark:text-brand-200">
             {status === 'pending' ? 'Analizando tu producto…' : 'Empieza con tu URL'}
           </h2>
-          <p className="mt-1 text-sm text-brand-800">{message}</p>
+          <p className="mt-1 text-sm text-brand-800 dark:text-brand-300">{message}</p>
         </div>
         <Link to="/perfil" className="btn-primary">
           {status === 'pending' ? <InlineSpinner label="Procesando" /> : 'Configurar producto'}

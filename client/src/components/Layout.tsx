@@ -2,6 +2,7 @@ import { useState, type ReactNode } from 'react';
 import { useLocation } from 'react-router-dom';
 import { IconDashboard, IconLeads, IconMenu, IconUser } from './icons';
 import { Sidebar, type NavItem } from './Sidebar';
+import { ThemeToggle } from './ThemeToggle';
 
 interface LayoutProps {
   email: string | null;
@@ -21,7 +22,7 @@ export function Layout({ email, newLeads = 0, onSignOut, children }: LayoutProps
   ];
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white dark:bg-neutral-950">
       <Sidebar
         items={items}
         email={email}
@@ -31,7 +32,7 @@ export function Layout({ email, newLeads = 0, onSignOut, children }: LayoutProps
       />
 
       <div className="lg:pl-[248px]">
-        <header className="sticky top-0 z-20 flex h-16 items-center gap-3 border-b border-surface-line bg-white/90 px-4 backdrop-blur lg:hidden">
+        <header className="sticky top-0 z-20 flex h-16 items-center gap-3 border-b border-surface-line bg-white/90 px-4 backdrop-blur dark:border-neutral-800 dark:bg-neutral-950/90 lg:hidden">
           <button
             type="button"
             onClick={() => setMobileOpen(true)}
@@ -43,9 +44,12 @@ export function Layout({ email, newLeads = 0, onSignOut, children }: LayoutProps
           <span className="font-display text-[15px] font-bold tracking-tight">
             Reddit<span className="text-brand-500">Leads</span>
           </span>
+          <div className="ml-auto">
+            <ThemeToggle />
+          </div>
         </header>
 
-        <main className="mx-auto w-full max-w-[1120px] px-5 py-7 sm:px-8 lg:px-10 lg:py-10">
+        <main className="mx-auto w-full max-w-[1440px] px-5 py-7 sm:px-8 lg:px-10 lg:py-10">
           <div key={location.pathname} className="animate-fade-up">
             {children}
           </div>

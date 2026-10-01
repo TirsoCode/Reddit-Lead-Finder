@@ -130,6 +130,17 @@ export interface Stats {
   topSubreddits: Array<{ subreddit: string; count: number }>;
 }
 
+/** Estado de la conexión con el proveedor de IA (OpenRouter). */
+export interface AiHealth {
+  status: 'ready' | 'unconfigured' | 'invalid_key' | 'unreachable' | 'error';
+  message: string;
+  provider: string;
+  model: string;
+  scoringModel: string;
+  placeholderKey: boolean;
+  detail?: string;
+}
+
 // --- Endpoints -------------------------------------------------------------
 
 export interface ProfileResponse {
@@ -191,4 +202,7 @@ export const api = {
   deleteLead: (leadId: string) => request<void>(`/leads/${leadId}`, { method: 'DELETE' }),
 
   getStats: () => request<{ stats: Stats }>('/stats'),
+
+  /** Comprueba contra OpenRouter si la clave y el modelo responden de verdad. */
+  getAiStatus: () => request<{ ai: AiHealth }>('/ai/status'),
 };

@@ -19,28 +19,6 @@ function Base({ children, ...props }: IconProps) {
   );
 }
 
-/**
- * Logotipo de Reddit (snoo) en un solo color: cabeza rellena con los ojos y la
- * boca calados (fill-rule evenodd) y la antena con su bola encima.
- */
-export function IconReddit(props: IconProps) {
-  return (
-    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" {...props}>
-      {/* antena */}
-      <path d="M10.4 5.9 8 4.2" stroke="currentColor" strokeWidth={1.7} strokeLinecap="round" fill="none" />
-      <circle cx={6.9} cy={3.5} r={2.1} />
-      {/* cabeza + huecos (ojos y sonrisa) */}
-      <path
-        fillRule="evenodd"
-        d="M3.1 12.3a8.9 6.9 0 1 0 17.8 0 8.9 6.9 0 1 0-17.8 0Z
-           M6.6 12.3a2.3 2.3 0 1 0 4.6 0 2.3 2.3 0 1 0-4.6 0Z
-           M12.8 12.3a2.3 2.3 0 1 0 4.6 0 2.3 2.3 0 1 0-4.6 0Z
-           M8.6 14.8a3.6 3.6 0 0 0 6.8 0 8 8 0 0 1-6.8 0Z"
-      />
-    </svg>
-  );
-}
-
 export function IconDashboard(props: IconProps) {
   return (
     <Base {...props}>
@@ -239,6 +217,25 @@ export function IconClock(props: IconProps) {
     <Base {...props}>
       <circle cx="12" cy="12" r="8.5" />
       <path d="M12 7.5V12l3 2" />
+    </Base>
+  );
+}
+
+/** Luna: el icono que se muestra mientras la web está en modo oscuro. */
+export function IconMoon(props: IconProps) {
+  return (
+    <Base {...props}>
+      <path d="M20 14.2A8.2 8.2 0 0 1 9.8 4 8.5 8.5 0 1 0 20 14.2Z" />
+    </Base>
+  );
+}
+
+/** Sol: el icono que se muestra mientras la web está en modo claro. */
+export function IconSun(props: IconProps) {
+  return (
+    <Base {...props}>
+      <circle cx="12" cy="12" r="4.2" />
+      <path d="M12 3v2.2M12 18.8V21M3 12h2.2M18.8 12H21M5.6 5.6l1.6 1.6M16.8 16.8l1.6 1.6M18.4 5.6l-1.6 1.6M7.2 16.8l-1.6 1.6" />
     </Base>
   );
 }
