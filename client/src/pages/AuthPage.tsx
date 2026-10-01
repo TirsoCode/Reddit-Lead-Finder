@@ -1,5 +1,5 @@
 import { useEffect, useState, type FormEvent } from 'react';
-import { isAuthConfigured, signIn, signInWithGoogle, signUp, useDevAuth } from '../lib/auth';
+import { isAuthConfigured, signIn, signInWithGoogle, signUp } from '../lib/auth';
 import { Spinner } from '../components/ui';
 import { IconArrowLeft } from '../components/icons';
 import { Logo } from '../components/Logo';
@@ -82,7 +82,8 @@ export function AuthPage({ onBack }: AuthPageProps) {
             <code className="rounded bg-surface-muted dark:bg-neutral-800 px-1.5 py-0.5">VITE_SUPABASE_ANON_KEY</code> a tu
             archivo <code className="rounded bg-surface-muted dark:bg-neutral-800 px-1.5 py-0.5">.env</code> y reinicia la
             aplicación.
-          </p>        </div>
+          </p>
+        </div>
       </div>
     );
   }
@@ -173,22 +174,15 @@ export function AuthPage({ onBack }: AuthPageProps) {
               <span className="h-px flex-1 bg-surface-line" />
             </div>
 
-            {useDevAuth ? (
-              <p className="rounded-lg bg-surface-muted dark:bg-neutral-800 px-3.5 py-2.5 text-center text-xs text-ink-soft dark:text-neutral-300">
-                Modo local: la autenticación la sirve el propio backend (Supabase está desactivado
-                con <code>DEV_AUTH=true</code>).
-              </p>
-            ) : (
-              <button
-                type="button"
-                onClick={handleGoogle}
-                disabled={googleLoading}
-                className="btn-secondary w-full"
-              >
-                {googleLoading ? <Spinner className="h-4 w-4" /> : <GoogleMark />}
-                Continuar con Google
-              </button>
-            )}
+            <button
+              type="button"
+              onClick={handleGoogle}
+              disabled={googleLoading}
+              className="btn-secondary w-full"
+            >
+              {googleLoading ? <Spinner className="h-4 w-4" /> : <GoogleMark />}
+              Continuar con Google
+            </button>
 
             <p className="mt-6 text-center text-sm text-ink-muted dark:text-neutral-400">
               {mode === 'signup' ? '¿Ya tienes cuenta?' : '¿Todavía no tienes cuenta?'}{' '}

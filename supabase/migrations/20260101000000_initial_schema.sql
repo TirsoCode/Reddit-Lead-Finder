@@ -1,11 +1,15 @@
 -- ---------------------------------------------------------------------------
--- RedditLeads — esquema de base de datos (PostgreSQL / Supabase)
+-- RedditLeads — esquema inicial (PostgreSQL / Supabase)
 --
--- Todo el acceso de la aplicación pasa por la API (Express) con la service
--- role, por eso RLS queda activado sin políticas: el cliente nunca habla
--- directamente con estas tablas, solo usa Supabase Auth.
+-- El cliente nunca habla con estas tablas: solo usa Supabase Auth. Todo el
+-- acceso a datos sale de la API de Express, que se conecta con el rol `postgres`
+-- de la connection string (ese rol ignora RLS) y filtra por `user_id` en el SQL.
+-- Por eso RLS queda activado sin políticas: si alguien se cuela con la anon
+-- key, no ve ni una fila.
 --
--- Ejecuta este archivo con:  npm run db:migrate
+-- Aplica este archivo con `npm run db:migrate`, o con la CLI de Supabase:
+--   supabase link --project-ref TU_REF
+--   supabase db push
 -- ---------------------------------------------------------------------------
 
 create extension if not exists pgcrypto;

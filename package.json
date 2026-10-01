@@ -17,12 +17,14 @@
     "start": "node dist/server/index.js",
     "typecheck": "tsc -p tsconfig.server.json --noEmit && tsc -p client/tsconfig.json --noEmit",
     "db:migrate": "tsx server/migrate.ts",
+    "db:link": "supabase link",
+    "db:push": "supabase db push",
+    "db:status": "supabase migration list",
     "scan": "tsx server/scripts/scan.ts",
     "cron": "tsx server/scripts/cron.ts",
     "client:deploy": "vercel deploy --prod"
   },
   "dependencies": {
-    "@electric-sql/pglite": "^0.5.8",
     "@supabase/supabase-js": "^2.48.1",
     "cheerio": "^1.0.0",
     "cors": "^2.8.5",

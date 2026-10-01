@@ -7,8 +7,6 @@ import { leadsRouter } from './routes/leads.js';
 import { profileRouter } from './routes/profile.js';
 import { statsRouter } from './routes/stats.js';
 import { aiRouter } from './routes/ai.js';
-import { usingDevAuth } from './auth.js';
-import { devAuthRouter } from './routes/devAuth.js';
 import { startScheduler } from './services/scheduler.js';
 
 const log = createLogger('server');
@@ -35,19 +33,14 @@ export function createApp() {
       res.json({
         ok: true,
         env: env.NODE_ENV,
-        database: env.DATABASE_URL.startsWith('pglite://') ? 'pglite' : 'postgres',
-        auth: usingDevAuth ? 'dev' : 'supabase',
+        database: 'supabase',
+        auth: 'supabase',
         time: new Date().toISOString(),
       });
     } catch {
       res.status(503).json({ ok: false, error: 'La base de datos no responde' });
     }
   });
-
-  // Modo local: registro/login propio. No se monta si se usa Supabase.
-  if (usingDevAuth) {
-    app.use('/api/dev', devAuthRouter);
-  }
 
   app.use('/api/profile', profileRouter);
   app.use('/api/leads', leadsRouter);

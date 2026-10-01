@@ -1,74 +1,76 @@
-import { readFile } from 'node:fs/promises';
+import { readdir, readFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { db, pool, query } from './db.js';
-import { env } from './env.js';
+import { closePool, exec, query, withTransaction } from './db.js';
 import { createLogger } from './logger.js';
 
 const log = createLogger('migrate');
 const here = dirname(fileURLToPath(import.meta.url));
 
 /** Raíz del repositorio, válida tanto en `tsx server/` como en `dist/server/`. */
-export const ROOT_DIR = join(here, '..');
+const ROOT_DIR = join(here, '..');
 
-/**
- * En modo local (DEV_AUTH) no hay Supabase, así que recreamos la tabla `auth.users`
- * que el esquema espera para la clave ajena. Es una versión mínima: solo guarda
- * el email y el hash scrypt de la contraseña.
- */
-const DEV_AUTH_SCHEMA = `
-create schema if not exists auth;
-
-create table if not exists auth.users (
-  id            uuid primary key default gen_random_uuid(),
-  email         text not null unique,
-  password_hash text,
-  created_at    timestamptz not null default now()
-);
-`;
-
-async function main(): Promise<void> {
+/** Las migraciones viven aquí, con el prefijo de timestamp que usa la CLI. */
+async function findMigrationsDir(): Promise<string> {
   const candidates = [
-    join(ROOT_DIR, 'supabase', 'schema.sql'),
-    join(process.cwd(), 'supabase', 'schema.sql'),
+    join(ROOT_DIR, 'supabase', 'migrations'),
+    join(process.cwd(), 'supabase', 'migrations'),
   ];
 
-  let sql: string | null = null;
   for (const candidate of candidates) {
     try {
-      sql = await readFile(candidate, 'utf8');
-      break;
+      const entries = await readdir(candidate);
+      if (entries.some((entry) => entry.endsWith('.sql'))) return candidate;
     } catch {
       continue;
     }
   }
 
-  if (!sql) {
-    throw new Error('No se encontró supabase/schema.sql');
+  throw new Error('No se encontró la carpeta supabase/migrations con archivos .sql');
+}
+
+async function main(): Promise<void> {
+  const dir = await findMigrationsDir();
+  const files = (await readdir(dir)).filter((file) => file.endsWith('.sql')).sort();
+
+  if (files.length === 0) {
+    throw new Error(`No hay migraciones en ${dir}`);
   }
 
-  if (env.DEV_AUTH) {
-    log.info('DEV_AUTH activo: creando la tabla mínima auth.users…');
-    await db.exec(DEV_AUTH_SCHEMA);
+  for (const file of files) {
+    const sql = await readFile(join(dir, file), 'utf8');
+    log.info(`Aplicando ${file}…`);
+
+    // Una transacción por migración: si una falla no deja la anterior a medias.
+    // La migración va por el mismo cliente que la transacción, si no el
+    // `rollback` no revertiría nada.
+    await withTransaction(async (client) => {
+      await exec(sql, client);
+    });
+
+    log.info(`  ${file} aplicada`);
   }
 
-  log.info(`Aplicando esquema (driver: ${db.kind})…`);
-  await db.exec(sql);
-  log.info('Esquema aplicado correctamente');
-
-  const { rows } = await pool.query<{ table_name: string }>(
+  const tables = await query<{ table_name: string }>(
     `select table_name from information_schema.tables
      where table_schema = 'public' and table_name in ('profiles','leads','scan_runs')
      order by table_name`,
   );
-  log.info('Tablas detectadas', rows.map((row) => row.table_name).join(', '));
-  void query;
+
+  const found = tables.map((row) => row.table_name);
+  const missing = ['leads', 'profiles', 'scan_runs'].filter((table) => !found.includes(table));
+
+  if (missing.length > 0) {
+    throw new Error(`La migración no creó estas tablas: ${missing.join(', ')}`);
+  }
+
+  log.info('Esquema correcto:', found.join(', '));
 }
 
 main()
-  .then(() => pool.end())
+  .then(() => closePool())
   .catch(async (error) => {
     log.error('Fallo la migración', error);
-    await pool.end().catch(() => undefined);
+    await closePool().catch(() => undefined);
     process.exit(1);
   });

@@ -27,25 +27,22 @@ const schema = z.object({
   APP_URL: z.string().default('http://localhost:3000'),
 
   /**
-   * Dos drivers posibles:
-   *   postgresql://…  → PostgreSQL normal (Supabase, docker, Railway…)
-   *   pglite://carpeta → PGlite, el mismo PostgreSQL en WASM dentro del proceso.
-   *                      Para desarrollo local sin instalar nada.
+   * Connection string del PostgreSQL de Supabase, la URI de
+   * Project Settings → Database (no la del pooler). Es el único origen de datos:
+   * no hay base de datos local alternativa.
    */
-  DATABASE_URL: z.string().min(1, 'DATABASE_URL es obligatoria'),
-  PGLITE_DATA_DIR: z.string().optional(),
-
-  SUPABASE_URL: z.string().default('http://localhost:54321'),
-  SUPABASE_ANON_KEY: z.string().default('local-dev-anon-key'),
-
-  // Modo de autenticación local (solo desarrollo). Con DEV_AUTH=true la app trae
-  // su propio registro/login por email y no necesita Supabase. En producción
-  // se usa Supabase (email + Google OAuth) y esta opción se ignora.
-  DEV_AUTH: boolish(false),
-  DEV_AUTH_SECRET: z
+  DATABASE_URL: z
     .string()
-    .default('redditleads-dev-secret-no-usar-en-produccion')
-    .pipe(z.string().min(16, 'DEV_AUTH_SECRET debe tener al menos 16 caracteres')),
+    .min(1, 'DATABASE_URL es obligatoria')
+    .refine(
+      (value) => value.startsWith('postgres://') || value.startsWith('postgresql://'),
+      'DATABASE_URL debe ser una URI postgresql:// de Supabase',
+    ),
+
+  // Supabase Auth (email + Google OAuth). El servidor usa la anon key para
+  // validar los JWT; el cliente usa la misma clave para iniciar sesión.
+  SUPABASE_URL: z.string().url('SUPABASE_URL debe ser una URL válida'),
+  SUPABASE_ANON_KEY: z.string().min(1, 'SUPABASE_ANON_KEY es obligatoria'),
 
   REDDIT_CLIENT_ID: z.string().min(1, 'REDDIT_CLIENT_ID es obligatoria'),
   REDDIT_CLIENT_SECRET: z.string().min(1, 'REDDIT_CLIENT_SECRET es obligatoria'),
@@ -108,13 +105,15 @@ export function isPlaceholderSecret(value: string): boolean {
 
 /** Resumen de qué servicios externos están configurados de verdad. */
 export function describeIntegrations(): Array<{ name: string; ready: boolean; detail: string }> {
-  // Con DEV_AUTH la autenticación la sirve el propio backend, así que Supabase
-  // no es necesario y no debe aparecer como algo que falta.
-  const supabaseReady = usingSupabaseAuth()
-    ? raw.SUPABASE_URL.startsWith('https://') && !isPlaceholderSecret(raw.SUPABASE_ANON_KEY)
-    : true;
-
   return [
+    {
+      name: 'supabase',
+      ready:
+        raw.SUPABASE_URL.startsWith('https://') &&
+        !isPlaceholderSecret(raw.SUPABASE_ANON_KEY) &&
+        !isPlaceholderSecret(raw.DATABASE_URL),
+      detail: 'Base de datos y autenticación',
+    },
     {
       name: 'openrouter',
       ready: !isPlaceholderSecret(raw.OPENROUTER_API_KEY),
@@ -125,14 +124,5 @@ export function describeIntegrations(): Array<{ name: string; ready: boolean; de
       ready: !isPlaceholderSecret(raw.REDDIT_CLIENT_ID) && !isPlaceholderSecret(raw.REDDIT_CLIENT_SECRET),
       detail: `API oficial · ${raw.REDDIT_WINDOW_HOURS} h de ventana`,
     },
-    {
-      name: 'supabase',
-      ready: supabaseReady,
-      detail: usingSupabaseAuth() ? 'Autenticación activa' : 'Usando el login local (DEV_AUTH)',
-    },
   ];
-}
-
-function usingSupabaseAuth(): boolean {
-  return !raw.DEV_AUTH;
 }

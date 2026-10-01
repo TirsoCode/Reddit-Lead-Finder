@@ -1,9 +1,17 @@
 node_modules/
 dist/
 client/dist/
+
+# Datos de la base de datos local de PGlite que se usaba hasta ahora.
+# Ya no se usa, pero la carpeta sigue en disco: bórrala cuando quieras.
+.redditleads/
+
+# Secretos: los .env reales nunca se suben, pero .env.example sí (es la plantilla)
 .env
 .env.local
 .env.*.local
+!.env.example
+
 *.log
 npm-debug.log*
 .DS_Store
@@ -12,7 +20,3 @@ npm-debug.log*
 .vscode/
 coverage/
 *.tsbuildinfo
-
-# Base de datos local de PGlite (contiene los usuarios de desarrollo)
-.redditleads/
-.env*

@@ -22,45 +22,64 @@ No publica nada por ti: la respuesta siempre la escribes y la pegas tú.
 |---|---|
 | Frontend | React 18, TypeScript, Vite, Tailwind CSS, React Router |
 | Backend | Node, Express, TypeScript, Zod |
-| Base de datos | PostgreSQL (Supabase) · PGlite en desarrollo local |
-| Autenticación | Supabase (email + Google OAuth) · login local en desarrollo |
+| Base de datos | PostgreSQL de Supabase |
+| Autenticación | Supabase (email + Google OAuth) |
 | IA | OpenRouter (análisis, puntuación y redacción) |
 | Reddit | API oficial de Reddit (OAuth) |
 | Automatización | node-cron (08:00 y 20:00 UTC) |
 
 ---
 
-## Arranque rápido (sin configurar nada)
+## Arranque rápido
 
-Para probarlo en local **no necesitas Supabase, ni Reddit, ni OpenRouter**. La base de datos es
-[PGlite](https://pglite.dev) (el mismo PostgreSQL compilado a WASM, dentro del proceso) y el
-registro/login lo sirve el propio backend.
+La app necesita un proyecto de Supabase (gratis) para la base de datos y el login. Reddit y
+OpenRouter son opcionales: sin ellos la app funciona y solo avisa de que el análisis con IA y la
+búsqueda de posts no responden.
 
 ```bash
 git clone https://github.com/TirsoCode/Reddit-Lead-Finder.git
 cd Reddit-Lead-Finder
 npm install
-cp .env.example .env      # ya viene relleno para el modo local
-npm run db:migrate
+cp .env.example .env      # rellena las credenciales de Supabase (ver más abajo)
+npm run db:migrate        # crea las tablas
 npm run dev
 ```
 
-Abre **http://localhost:5173** y crea una cuenta con cualquier email.
+Abre **http://localhost:5173** y crea una cuenta.
 
-> En este modo el análisis con IA y la búsqueda en Reddit no funcionan hasta que metas tus
-> claves de OpenRouter y Reddit en `.env`. El resto de la app (perfil, leads, respuestas,
-> estadísticas) sí responde con normalidad.
+Si prefieres gestionar el esquema con la CLI de Supabase en vez de con el script:
+
+```bash
+npx supabase login
+npm run db:link -- --project-ref TU_PROJECT_REF
+npm run db:push
+```
 
 ## Configuración real (producción)
 
 ### 1. Supabase — base de datos y login
 
-1. Crea un proyecto en [supabase.com](https://supabase.com).
-2. En **SQL Editor**, pega y ejecuta el contenido de [`supabase/schema.sql`](supabase/schema.sql).
-   Crea las tablas `profiles`, `leads` y `scan_runs` con sus índices y RLS.
-3. En **Project Settings → API**, copia la *connection string* (URI, no la pooler) y las claves
-   *anon* y *service role*.
-4. En **Authentication → Providers**, activa **Email** y **Google OAuth**.
+1. Crea un proyecto en [supabase.com](https://supabase.com) y guarda la contraseña de la base de
+   datos (la que eliges al crearlo).
+2. Aplica el esquema, que crea las tablas `profiles`, `leads` y `scan_runs` con sus índices, RLS y
+   el trigger que crea el perfil al registrarse:
+   ```bash
+   # con la connection string en .env
+   npm run db:migrate
+
+   # o con la CLI
+   npx supabase login
+   npm run db:link -- --project-ref TU_PROJECT_REF
+   npm run db:push
+   ```
+   El SQL está en [`supabase/migrations/`](supabase/migrations); también puedes pegarlo a mano en
+   el **SQL Editor**.
+3. En **Project Settings → Database**, copia la *connection string* en modo **URI** (no la del
+   pooler) para `DATABASE_URL`.
+4. En **Project Settings → API**, copia la URL y la clave *anon / public* para `SUPABASE_URL` y
+   `SUPABASE_ANON_KEY`. No necesitas la *service role*: la API se conecta a PostgreSQL con el rol
+   `postgres` de la connection string.
+5. En **Authentication → Providers**, activa **Email** y **Google OAuth**.
    Para Google, mete el client id y el secret que te dé Google Cloud Console y añade
    `http://localhost:5173` y tu dominio a las URLs de redirección permitidas.
 
@@ -85,8 +104,8 @@ genérico.
 
 ### 4. Variables de entorno
 
-Copia `.env.example` a `.env` y rellénalo. En producción deja siempre `DEV_AUTH=false` para que la
-autenticación la lleve Supabase.
+Copia `.env.example` a `.env` y rellénalo. Lo imprescindible es `DATABASE_URL`, `SUPABASE_URL` y
+`SUPABASE_ANON_KEY`; con eso la app arranca y funciona.
 
 ## Tema claro y oscuro
 
@@ -104,7 +123,10 @@ montar React.
 | `npm run build` | Compila cliente y servidor |
 | `npm start` | Arranca la build en producción (el Express sirve también el frontend) |
 | `npm run typecheck` | TypeScript estricto en servidor y cliente |
-| `npm run db:migrate` | Aplica `supabase/schema.sql` |
+| `npm run db:migrate` | Aplica las migraciones de `supabase/migrations/` en orden |
+| `npm run db:link` | Enlaza la carpeta con tu proyecto de Supabase (CLI) |
+| `npm run db:push` | Sube las migraciones pendientes con la CLI |
+| `npm run db:status` | Lista las migraciones y las que faltan aplicar |
 | `npm run scan` | Fuerza una búsqueda para un usuario |
 | `npm run cron` | Ejecuta el ciclo automático una vez |
 
@@ -119,15 +141,21 @@ server/
   routes/          /api/profile, /api/leads, /api/stats, /api/ai, /api/health
   services/        pipeline, analyze, reddit, scoring, replies, scheduler
   repositories/    acceso a datos (profiles, leads, scan_runs)
-  db.ts            doble driver: PostgreSQL o PGlite
-supabase/schema.sql
+  db.ts            pool de PostgreSQL y helpers de consulta
+supabase/
+  migrations/      esquema, un archivo por migración (formato CLI de Supabase)
+  config.toml      configuración de la CLI de Supabase
 ```
 
 ## Seguridad
 
 - Toda la autenticación y los datos pasan por la API de Express; el cliente no habla nunca
   directamente con la base de datos.
-- Las tablas tienen RLS activado **sin políticas**: desde el navegador no se puede leer nada.
+- Las tablas tienen RLS activado **sin políticas**: desde el navegador no se puede leer nada. La
+  API llega con el rol `postgres` de la connection string, que ignora RLS, y filtra cada consulta
+  por `user_id` en el SQL.
+- La *anon key* es la única clave que llega al navegador. La *service role* no se usa ni se
+  comparte.
 - El scraper bloquea URLs privadas y locales (protección SSRF).
 - Las claves viven solo en variables de entorno. `.env` está en `.gitignore`; sube solo
   `.env.example`.
