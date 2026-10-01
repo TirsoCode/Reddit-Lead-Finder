@@ -5,8 +5,7 @@ import { cx } from '../lib/format';
  *
  * El punto rojo es el origen del pulso, las dos ondas son el escaneo y el punto
  * blanco apoyado en la onda exterior es el lead detectado. No usa el snoo de
- * Reddit a propósito: esa marca es de Reddit y el pie de la portada ya dice
- * "No afiliado con Reddit".
+ * Reddit a propósito: esa marca es de Reddit, no nuestra.
  *
  * Las formas están calculadas sobre un viewBox de 32 para que el mismo trazado
  * sirva para el favicon (`client/public/favicon.svg`) y para el componente.

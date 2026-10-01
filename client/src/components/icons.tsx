@@ -202,3 +202,43 @@ export function IconArrowLeft(props: IconProps) {
     </Base>
   );
 }
+
+/** Lápiz: redacción del borrador de respuesta. */
+export function IconPencil(props: IconProps) {
+  return (
+    <Base {...props}>
+      <path d="M4 20h4L19.5 8.5a2.12 2.12 0 0 0-3-3L5 17v3Z" />
+      <path d="m13.5 6.5 3 3" />
+    </Base>
+  );
+}
+
+/** Escudo con visto: seguridad y control del usuario. */
+export function IconShield(props: IconProps) {
+  return (
+    <Base {...props}>
+      <path d="M12 3.5 5 6v5.5c0 4.2 3 7.6 7 9 4-1.4 7-4.8 7-9V6l-7-2.5Z" />
+      <path d="m9 12 2 2 4-4" />
+    </Base>
+  );
+}
+
+/** Ojo: solo lectura, la sesión es tuya. */
+export function IconEye(props: IconProps) {
+  return (
+    <Base {...props}>
+      <path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z" />
+      <circle cx="12" cy="12" r="3" />
+    </Base>
+  );
+}
+
+/** Reloj: ritmo de los envíos y del próximo barrido. */
+export function IconClock(props: IconProps) {
+  return (
+    <Base {...props}>
+      <circle cx="12" cy="12" r="8.5" />
+      <path d="M12 7.5V12l3 2" />
+    </Base>
+  );
+}

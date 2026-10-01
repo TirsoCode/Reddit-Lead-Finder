@@ -1,36 +1,144 @@
 import { useState, type FormEvent } from 'react';
-import { IconCheck, IconComment, IconLink, IconReddit, IconSearch, IconSparkle, IconUpvote } from '../components/icons';
+import {
+  IconCheck,
+  IconComment,
+  IconCopy,
+  IconEye,
+  IconPencil,
+  IconReddit,
+  IconSearch,
+  IconShield,
+} from '../components/icons';
 import { LogoMark } from '../components/Logo';
+import { copyToClipboard, cx, relevanceTone } from '../lib/format';
 
 interface LandingProps {
   onAuth: () => void;
 }
 
-const STEPS = [
+/** Los tres avisos que tranquilizan antes de registrarse. */
+const TRUST = [
   {
-    icon: IconLink,
-    title: 'Pegas la URL de tu producto',
-    body: 'No hay que configurar nada. La app la lee y entiende qué vendes y qué problema resuelves.',
+    icon: IconShield,
+    title: 'Tú publicas, siempre',
+    body: 'Nada sale de la app sin que tú lo copies y lo pegues. Eres quien decide cuándo, dónde y si respondes.',
   },
   {
-    icon: IconSparkle,
-    title: 'La IA deduce a quién le duele',
-    body: 'Genera las palabras clave y los subreddits donde esa persona pregunta soluciones.',
+    icon: IconEye,
+    title: 'Tu cuenta, solo lectura',
+    body: 'La búsqueda usa la API oficial de Reddit. Ni tu contraseña ni una sesión prestada: nunca publicamos en tu nombre.',
   },
+  {
+    icon: IconCheck,
+    title: 'Cero duplicados',
+    body: 'Cada conversación aparece una sola vez entre barridos, te hayas dado cuenta de ella o no.',
+  },
+];
+
+interface Step {
+  icon: typeof IconSearch;
+  title: string;
+  body: string;
+}
+
+const STEPS: Step[] = [
   {
     icon: IconSearch,
-    title: 'Busca en Reddit lo que se ha escrito',
-    body: 'Recorre las conversaciones recientes de todo Reddit y se queda con las que encajan.',
+    title: 'Encuentra el hilo',
+    body: 'Pegas la URL, la IA deduce qué vendes y a quién le duele, y recorre lo que se ha escrito en Reddit en las últimas 48 horas.',
   },
   {
-    icon: IconUpvote,
-    title: 'Cada post, puntuado del 1 al 100',
-    body: 'Sabes de un vistazo cuáles vale la pena. Arriba son clientes reales, abajo es ruido.',
+    icon: IconPencil,
+    title: 'Escribe la respuesta',
+    body: 'Un borrador en tu tono que contesta la pregunta y cita sus palabras. Lo editas, lo apruebas o lo escribes tú desde cero.',
   },
   {
-    icon: IconComment,
-    title: 'Te escribe la respuesta en español',
-    body: 'Copias, pegas y publicas. RedditLeads nunca publica por ti: la respuesta es tuya.',
+    icon: IconCopy,
+    title: 'La pegas en Reddit',
+    body: 'Copias cada borrador a tu propia cuenta, en tu propio navegador, al ritmo que te venga bien. La respuesta siempre es tuya.',
+  },
+];
+
+/** Fila del mockup del paso 1: los hilos acaban de llegar del barrido. */
+const MINI_FEED = [
+  { sub: 'r/Shopify', score: 94, title: '¿Cómo organizáis vuestro histórico de pedidos?' },
+  { sub: 'r/ecommerce', score: 92, title: '¿Qué herramienta simple para ver pedidos sin ERP?' },
+  { sub: 'r/emprendedores', score: 86, title: 'He perdido el rastro de 40 pedidos en un mes…' },
+];
+
+/** Mockup del paso 3: la cola aprobada, lista para copiar y pegar. */
+const MINI_QUEUE = [
+  { sub: 'r/Shopify', title: '¿Cómo organizáis vuestro histórico de pedidos?', status: 'lista' },
+  { sub: 'r/emprendedores', title: 'He perdido el rastro de 40 pedidos en un mes…', status: 'cola' },
+  { sub: 'r/ecommerce', title: '¿Qué herramienta simple usáis para ver pedidos?', status: 'cola' },
+];
+
+/** Demo de la cola: un producto de ejemplo (gestor de pedidos para tiendas). */
+interface DemoLead {
+  id: string;
+  sub: string;
+  user: string;
+  score: number;
+  title: string;
+  body: string;
+  highlight: string;
+  reason: string;
+  rules: string;
+  draft: string;
+}
+
+const DEMO_LEADS: DemoLead[] = [
+  {
+    id: 'pedidos',
+    sub: 'r/Shopify',
+    user: 'u/ana_shop',
+    score: 94,
+    title: '¿Cómo organizáis vuestro histórico de pedidos?',
+    body: 'Llevo medio año con la tienda y los pedidos están repartidos entre tres hojas de cálculo. La principal ya se cae con ~40 pedidos. Abierta a pagar por algo sencillo.',
+    highlight: 'Abierta a pagar por algo sencillo.',
+    reason: 'Dice el problema, la escala y el presupuesto, todo en un solo post.',
+    rules: 'r/Shopify permite nombrar un producto en un comentario cuando responde a la pregunta que se hace.',
+    draft:
+      'Nos pasó lo mismo con unos 40 pedidos: tres hojas y ninguna fiable. Lo que lo resolvió fue una sola lista compartida con una columna de estado, así que los duplicados caen en la misma fila en vez de apilarse. Una tarde de montaje y dos años de paz. Si te sirve te paso la estructura.',
+  },
+  {
+    id: 'rastreo',
+    sub: 'r/emprendedores',
+    user: 'u/diego_v',
+    score: 86,
+    title: 'He perdido el rastro de 40 pedidos en un mes. ¿Qué usáis vosotros?',
+    body: 'Vendo por Instagram y los directos me dejan los mensajes como pedidos. Me he comido dos envíos equivocados en un mes y ya no sé qué está pendiente de enviar.',
+    highlight: 'me he comido dos envíos equivocados en un mes',
+    reason: 'Un problema concreto, con coste real, en una comunidad que pregunta por herramientas.',
+    rules: 'r/emprendedores deja recomendar herramientas si va en respuesta directa a la pregunta.',
+    draft:
+      'Nos comíamos envíos igual hasta separar "pedido" de "mensaje": cada pedido pasa a una lista con estado (pendiente, enviado, entregado) y el mensaje se cierra. Basta con una columna. Si quieres te cuento cómo lo montamos en una tarde.',
+  },
+  {
+    id: 'erp',
+    sub: 'r/ecommerce',
+    user: 'u/merce_d',
+    score: 92,
+    title: '¿Qué herramienta simple usáis para ver los pedidos sin montar un ERP?',
+    body: 'No quiero un ERP para 60 pedidos al mes. Solo necesito ver de un vistazo qué va y qué se ha quedado atascado esta semana.',
+    highlight: 'sin montar un ERP',
+    reason: 'Pide recomendación explícita y descarta de entrada las soluciones grandes.',
+    rules: 'r/ecommerce exige aclarar si tienes relación con lo que recomiendas.',
+    draft:
+      'Nosotros paramos justo en ese punto: 60 pedidos al mes no justifican un ERP. Lo que funciona es una sola vista con estado por pedido y un aviso cuando lleva más de 48 h parado. Aviso de que lo uso yo, pero te dejo la plantilla si te encaja.',
+  },
+  {
+    id: 'envios',
+    sub: 'r/AskSpain',
+    user: 'u/lucia_h',
+    score: 87,
+    title: 'Los que tenéis tienda online, ¿cómo no os volvéis locos con los envíos?',
+    body: 'Pregunto en serio: entre transportistas, incidencias y devoluciones llevo un mes trabajando con un cuaderno y se me escapan cosas sin querer.',
+    highlight: 'se me escapan cosas sin querer',
+    reason: 'Dolor claro y cotidiano, aunque todavía va sin pedir herramienta.',
+    rules: 'r/AskSpain no admite autopromoción; solo se puede contar la experiencia propia.',
+    draft:
+      'Nosotros estábamos igual: cuaderno y tres pestañas. Lo que nos salvó fue tener cada envío con su estado a la vista y un repaso de dos minutos por la mañana. Nada de ERP. Si quieres te digo cómo lo montamos.',
   },
 ];
 
@@ -38,6 +146,10 @@ const FAQS = [
   {
     q: '¿Tengo que registrarme en Reddit?',
     a: 'No. La búsqueda usa la API oficial de Reddit, así que no te pedimos tu contraseña ni publicamos nada en tu nombre.',
+  },
+  {
+    q: '¿Respeta las normas de cada subreddit?',
+    a: 'Sí. Cada lead avisa antes de que respondas de lo que esa comunidad permite: si un subreddit no admite nombrar herramientas, lo verás en la ficha y no te enteras en el ban.',
   },
   {
     q: '¿Publica las respuestas por mí?',
@@ -76,20 +188,21 @@ export function Landing({ onAuth }: LandingProps) {
       <header className="sticky top-0 z-30 border-b border-[#F2E4D8] bg-[#FFF7F0]/85 backdrop-blur-md">
         <div className="mx-auto flex h-16 max-w-[1120px] items-center justify-between px-5 sm:px-8">
           <span className="flex items-center gap-2.5">
-            <span className="grid h-8 w-8 place-items-center rounded-lg bg-brand-500 shadow-sm">
-              <IconReddit className="h-[18px] w-[18px] text-white" />
-            </span>
+            <LogoMark className="h-8 w-8" />
             <span className="font-display text-[15px] font-bold tracking-tight text-ink">
-              Reply<span className="text-brand-500">Hey</span>
+              Reddit<span className="text-brand-500">Leads</span>
             </span>
           </span>
 
           <nav className="hidden items-center gap-8 md:flex">
-            <a href="#que-es" className="text-sm text-ink-muted transition hover:text-ink">
-              Qué es
-            </a>
             <a href="#como" className="text-sm text-ink-muted transition hover:text-ink">
               Cómo funciona
+            </a>
+            <a href="#cola" className="text-sm text-ink-muted transition hover:text-ink">
+              La cola de hoy
+            </a>
+            <a href="#seguridad" className="text-sm text-ink-muted transition hover:text-ink">
+              Seguridad
             </a>
             <a href="#faq" className="text-sm text-ink-muted transition hover:text-ink">
               Preguntas
@@ -159,7 +272,7 @@ export function Landing({ onAuth }: LandingProps) {
               type="submit"
               className="btn-primary shrink-0 gap-2 whitespace-nowrap rounded-2xl px-5 py-3 text-[15px] font-semibold sm:rounded-full"
             >
-              Encuentra leads con intención
+              Encuentra mi primer lead
               <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2.2}>
                 <path d="M4 12h15M13 6l6 6-6 6" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
@@ -170,81 +283,93 @@ export function Landing({ onAuth }: LandingProps) {
         </div>
       </section>
 
-      {/* ---------- Qué es, con dibujo de Reddit ---------- */}
-      <section id="que-es" className="bg-[#FFF9F4]">
-        <div className="mx-auto grid max-w-[1120px] items-center gap-14 px-5 py-20 sm:px-8 lg:grid-cols-2 lg:gap-20">
-          <div>
-            <h2 className="font-display text-[28px] font-bold leading-tight tracking-tight text-ink sm:text-[32px]">
-              Lo que pasa por Reddit
-            </h2>
-            <p className="mt-5 text-[15px] leading-relaxed text-ink-muted">
-              Millones de personas escriben cada día el problema que tienen. El problema es que
-              están enterradas en comunidades que no son las tuyas, con palabras que no se te ocurren.
-            </p>
-            <p className="mt-4 text-[15px] leading-relaxed text-ink-muted">
-              RedditLeads lee esas conversaciones y te las trae ordenadas por lo útil que sea.
-              Esto es un post real de la app:
-            </p>
-
-            <ul className="mt-8 space-y-3.5">
-              {[
-                'Posts de las últimas 48 horas, nada de contenido viejo',
-                'Puntuados de 1 a 100 según lo bien que encajen contigo',
-                'Con la respuesta en español ya redactada para copiar',
-              ].map((item) => (
-                <li key={item} className="flex gap-3 text-[15px] text-ink-soft">
-                  <span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-brand-50 text-brand-600">
-                    <IconCheck className="h-3 w-3" strokeWidth={2.6} />
+      {/* ---------- Los tres avisos ---------- */}
+      <section id="seguridad" className="border-t border-[#F2E4D8] bg-[#FFF9F4]">
+        <div className="mx-auto max-w-[1120px] px-5 py-12 sm:px-8">
+          <div className="grid gap-px overflow-hidden rounded-2xl border border-[#F2E4D8] bg-[#F2E4D8] sm:grid-cols-3">
+            {TRUST.map((item) => {
+              const TrustIcon = item.icon;
+              return (
+                <div key={item.title} className="bg-white p-6">
+                  <span className="grid h-10 w-10 place-items-center rounded-xl bg-brand-50 text-brand-600">
+                    <TrustIcon className="h-5 w-5" />
                   </span>
-                  {item}
-                </li>
-              ))}
-            </ul>
+                  <h3 className="mt-4 font-display text-[16px] font-semibold tracking-tight text-ink">
+                    {item.title}
+                  </h3>
+                  <p className="mt-2 text-[14px] leading-relaxed text-ink-muted">{item.body}</p>
+                </div>
+              );
+            })}
           </div>
-
-          <PostPreview />
         </div>
       </section>
 
-      {/* ---------- Línea del tiempo ---------- */}
-      <section id="como" className="border-t border-surface-line">
+      {/* ---------- Pasos, con sus maquetas ---------- */}
+      <section id="como" className="border-t border-surface-line bg-white">
         <div className="mx-auto max-w-[1120px] px-5 py-20 sm:px-8">
           <div className="max-w-xl">
             <h2 className="font-display text-[28px] font-bold leading-tight tracking-tight text-ink sm:text-[32px]">
               Qué hace, paso a paso
             </h2>
             <p className="mt-5 text-[15px] leading-relaxed text-ink-muted">
-              De una URL a una lista de conversaciones en las que puedes responder hoy mismo.
+              De una URL a una conversación en la que puedes responder hoy mismo.
             </p>
           </div>
 
-          <ol className="relative mt-14">
-            <span className="absolute left-[15px] top-2 hidden h-[calc(100%-2rem)] w-px bg-surface-line sm:block" />
+          <div className="mt-12 space-y-6">
             {STEPS.map((step, index) => {
               const StepIcon = step.icon;
               return (
-                <li key={step.title} className="relative flex gap-5 pb-9 last:pb-0 sm:gap-7">
-                  <span className="relative z-10 grid h-8 w-8 shrink-0 place-items-center rounded-full border border-surface-line bg-white text-ink">
-                    <StepIcon className="h-4 w-4" />
-                  </span>
-                  <div className="pt-0.5">
-                    <h3 className="font-display text-[17px] font-semibold tracking-tight text-ink">
-                      <span className="mr-2 text-brand-600">{String(index + 1).padStart(2, '0')}</span>
-                      {step.title}
-                    </h3>
-                    <p className="mt-2 max-w-lg text-[15px] leading-relaxed text-ink-muted">
-                      {step.body}
-                    </p>
+                <article key={step.title} className="overflow-hidden rounded-2xl border border-surface-line bg-white shadow-card">
+                  <header className="flex items-center justify-between gap-4 border-b border-surface-line px-5 py-5 sm:px-7">
+                    <span className="flex items-center gap-3.5">
+                      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-ink text-white">
+                        <StepIcon className="h-[18px] w-[18px]" />
+                      </span>
+                      <h3 className="font-display text-[19px] font-bold tracking-tight text-ink sm:text-[21px]">
+                        {step.title}
+                      </h3>
+                    </span>
+                    <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-ink-faint">
+                      Paso {index + 1}
+                    </span>
+                  </header>
+
+                  <div className="grid gap-7 px-5 py-6 sm:px-7 md:grid-cols-2 md:items-center">
+                    <p className="text-[15px] leading-relaxed text-ink-muted">{step.body}</p>
+                    {index === 0 ? <FeedMockup /> : index === 1 ? <DraftMockup /> : <QueueMockup />}
                   </div>
-                </li>
+                </article>
               );
             })}
-          </ol>
+          </div>
+        </div>
+      </section>
+
+      {/* ---------- La cola de hoy, interactiva ---------- */}
+      <section id="cola" className="border-t border-[#F2E4D8] bg-[#FFF9F4]">
+        <div className="mx-auto max-w-[1120px] px-5 py-20 sm:px-8">
+          <div className="max-w-3xl">
+            <h2 className="font-display text-[28px] font-bold leading-tight tracking-tight text-ink sm:text-[32px]">
+              La cola de hoy
+            </h2>
+            <p className="mt-5 text-[15px] leading-relaxed text-ink-muted">
+              Dos veces al día el barrido vuelve con los posts donde alguien describe el problema que
+              resuelves. Cada uno se puntúa del 0 al 100 con la frase que lo ganó, se contrasta con lo
+              que esa comunidad permite y llega con la respuesta escrita antes de que lo abras.
+            </p>
+            <p className="mt-4 text-[15px] leading-relaxed text-ink-muted">
+              Abre cualquiera de los cuatro de abajo para ver todo eso en un solo lead.
+            </p>
+          </div>
+
+          <QueueDemo onAuth={onAuth} />
         </div>
       </section>
 
       {/* ---------- Preguntas frecuentes ---------- */}
-      <section id="faq" className="border-t border-[#F2E4D8] bg-[#FFF9F4]">
+      <section id="faq" className="border-t border-[#F2E4D8] bg-white">
         <div className="mx-auto max-w-[820px] px-5 py-20 sm:px-8">
           <h2 className="font-display text-[28px] font-bold leading-tight tracking-tight text-ink sm:text-[32px]">
             Preguntas frecuentes
@@ -293,7 +418,7 @@ export function Landing({ onAuth }: LandingProps) {
             Empieza a leer lo que se dice de tu problema
           </h2>
           <button type="button" onClick={onAuth} className="btn-primary mt-8 px-6 py-3">
-            Crear cuenta gratis
+            Encuentra mi primer lead
           </button>
         </div>
       </section>
@@ -313,51 +438,228 @@ export function Landing({ onAuth }: LandingProps) {
   );
 }
 
-/** Dibujo de un post de Reddit tal y como lo muestra la app. */
-function PostPreview() {
+/* ============================================================================
+   Maquetas de los tres pasos
+   ============================================================================ */
+
+/** Paso 1: los hilos recién encontrados, con su nota. */
+function FeedMockup() {
   return (
-    <div className="relative">
-      <div className="absolute -inset-4 rounded-2xl bg-gradient-to-br from-brand-50 to-transparent" />
-      <div className="relative space-y-3">
-        <article className="card flex gap-4 p-4">
-          <div className="grid h-12 w-9 shrink-0 place-items-center rounded-md bg-brand-50 font-display text-[15px] font-bold text-brand-600">
-            94
-          </div>
-          <div className="min-w-0">
-            <h3 className="truncate text-[14px] font-semibold text-ink">
-              ¿Cómo organizáis vuestro histórico de pedidos?
-            </h3>
-            <p className="mt-1 text-xs text-ink-faint">r/Shopify · hace 4 h · 23 comentarios</p>
-            <p className="mt-2.5 line-clamp-2 text-[13px] leading-relaxed text-ink-muted">
-              Estoy montando mi tienda y me está costando encontrar un sitio donde ver los pedidos…
-            </p>
-          </div>
-        </article>
+    <div className="rounded-xl border border-surface-line bg-white p-3">
+      <p className="px-1 pb-2.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-ink-faint">
+        Barrido · 8:00
+      </p>
+      <ul className="space-y-2">
+        {MINI_FEED.map((row) => (
+          <li key={row.sub} className="flex items-start gap-3 rounded-lg bg-surface-subtle px-3 py-2.5">
+            <span
+              className={cx(
+                'grid h-6 w-7 shrink-0 place-items-center rounded-md text-[11px] font-bold',
+                relevanceTone(row.score),
+              )}
+            >
+              {row.score}
+            </span>
+            <span className="min-w-0">
+              <span className="block text-[11px] font-semibold text-ink-muted">{row.sub}</span>
+              <span className="block truncate text-[13px] text-ink">{row.title}</span>
+            </span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
 
-        <article className="card flex gap-4 p-4">
-          <div className="grid h-12 w-9 shrink-0 place-items-center rounded-md bg-surface-muted font-display text-[15px] font-bold text-ink-faint">
-            71
-          </div>
-          <div className="min-w-0">
-            <h3 className="truncate text-[14px] font-semibold text-ink">
-              ¿Alguien tiene una alternativa a Shopify para empezar?
-            </h3>
-            <p className="mt-1 text-xs text-ink-faint">r/ecommerce · hace 9 h · 41 comentarios</p>
-            <p className="mt-2.5 line-clamp-2 text-[13px] leading-relaxed text-ink-muted">
-              Busco algo sencillo para las primeras ventas, no quiero complicarme con plugins…
-            </p>
-          </div>
-        </article>
+/** Paso 2: el borrador escribiéndose. */
+function DraftMockup() {
+  return (
+    <div className="rounded-xl border border-surface-line bg-white p-4">
+      <p className="text-[12px] text-ink-faint">Borrador · r/Shopify</p>
+      <p className="mt-2.5 text-[14px] leading-relaxed text-ink-soft">
+        Nos pasó igual con unos 40 pedidos. Lo que lo resolvió fue una sola lista compartida, con una
+        columna de estado
+        <span
+          aria-hidden="true"
+          className="ml-0.5 inline-block h-[1.05em] w-[2px] translate-y-[3px] animate-pulse bg-brand-500"
+        />
+      </p>
+    </div>
+  );
+}
 
-        <div className="card ml-13 border-brand-100 bg-brand-50/50 p-4">
-          <p className="text-[11px] font-semibold uppercase tracking-wide text-brand-700">
-            Respuesta sugerida
+/** Paso 3: la cola aprobada, con su estado. */
+function QueueMockup() {
+  return (
+    <div className="space-y-2">
+      {MINI_QUEUE.map((row) => {
+        const ready = row.status === 'lista';
+        return (
+          <div
+            key={row.sub}
+            className="flex items-center gap-3 rounded-xl border border-surface-line bg-white px-3.5 py-3"
+          >
+            <IconReddit className="h-4 w-4 shrink-0 text-brand-500" />
+            <p className="min-w-0 flex-1 truncate text-[13px] text-ink-soft">
+              <span className="font-semibold text-ink">{row.sub}</span> “{row.title}”
+            </p>
+            <span
+              className={cx(
+                'flex shrink-0 items-center gap-1.5 text-[12px] font-medium',
+                ready ? 'text-emerald-700' : 'text-ink-faint',
+              )}
+            >
+              <span
+                className={cx('h-1.5 w-1.5 rounded-full', ready ? 'bg-emerald-500' : 'bg-ink-faint')}
+              />
+              {row.status}
+            </span>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+/* ============================================================================
+   Demo interactiva: la cola de hoy
+   ============================================================================ */
+
+function QueueDemo({ onAuth }: LandingProps) {
+  const [activeId, setActiveId] = useState(DEMO_LEADS[0].id);
+  const [copied, setCopied] = useState(false);
+  const lead = DEMO_LEADS.find((item) => item.id === activeId) ?? DEMO_LEADS[0];
+
+  async function handleCopy() {
+    const ok = await copyToClipboard(lead.draft);
+    if (ok) {
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 2000);
+    }
+  }
+
+  return (
+    <div className="mt-10 overflow-hidden rounded-2xl border border-[#F2E4D8] bg-white shadow-pop">
+      <div className="flex items-center justify-between gap-4 border-b border-surface-line px-5 py-4">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-ink-faint">
+          La cola de hoy
+        </p>
+        <p className="text-xs text-ink-faint">Barrido de las 8:00 · 4 de 12</p>
+      </div>
+
+      <div className="grid lg:grid-cols-[330px_1fr]">
+        {/* Lista */}
+        <div className="border-b border-surface-line lg:border-b-0 lg:border-r">
+          <ul className="divide-y divide-surface-line">
+            {DEMO_LEADS.map((item) => {
+              const active = item.id === lead.id;
+              return (
+                <li key={item.id}>
+                  <button
+                    type="button"
+                    onClick={() => setActiveId(item.id)}
+                    aria-pressed={active}
+                    className={cx(
+                      'focus-ring flex w-full items-start gap-3 border-l-[3px] px-5 py-4 text-left transition',
+                      active ? 'border-brand-500 bg-brand-50/70' : 'border-transparent hover:bg-surface-subtle',
+                    )}
+                  >
+                    <span className="min-w-0 flex-1">
+                      <span className="flex items-center justify-between gap-2">
+                        <span className="flex items-center gap-1.5 text-[13px] font-semibold text-ink">
+                          <IconReddit className="h-3.5 w-3.5 text-brand-500" />
+                          {item.sub}
+                        </span>
+                        <span
+                          className={cx(
+                            'grid h-5 w-7 shrink-0 place-items-center rounded-md text-[11px] font-bold',
+                            relevanceTone(item.score),
+                          )}
+                        >
+                          {item.score}
+                        </span>
+                      </span>
+                      <span className="mt-1.5 line-clamp-2 block text-[14px] leading-snug text-ink-soft">
+                        {item.title}
+                      </span>
+                    </span>
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+          <p className="border-t border-surface-line px-5 py-3.5 text-xs text-ink-faint">
+            4 leads nuevos · el próximo barrido llega a las 20:00.
           </p>
-          <p className="mt-2 text-[13px] leading-relaxed text-ink-soft">
-            Yo pasé por ese mismo problema al montar mi tienda y al final…
+        </div>
+
+        {/* Detalle del lead seleccionado */}
+        <div key={lead.id} className="animate-fade-up p-5 sm:p-7">
+          <p className="flex flex-wrap items-center gap-2 text-[13px] text-ink-muted">
+            <IconReddit className="h-4 w-4 text-brand-500" />
+            <span className="font-semibold text-ink">{lead.sub}</span>
+            <span className="text-ink-faint">·</span>
+            <span>{lead.user}</span>
           </p>
+
+          <h3 className="mt-3 font-display text-[20px] font-bold leading-snug tracking-tight text-ink sm:text-[22px]">
+            {lead.title}
+          </h3>
+
+          <p className="mt-3 text-[15px] leading-relaxed text-ink-muted">
+            <Highlighted text={lead.body} highlight={lead.highlight} />
+          </p>
+
+          <div className="mt-5 grid gap-3 sm:grid-cols-2">
+            <div className="rounded-xl bg-surface-muted p-4">
+              <p className="text-[12px] font-semibold text-ink-faint">
+                Puntuado {lead.score}/100 porque
+              </p>
+              <p className="mt-1.5 text-[13.5px] leading-relaxed text-ink-soft">{lead.reason}</p>
+            </div>
+            <div className="rounded-xl bg-surface-muted p-4">
+              <p className="flex items-center gap-1.5 text-[12px] font-semibold text-ink-faint">
+                <IconShield className="h-3.5 w-3.5" />
+                Normas, léelas primero
+              </p>
+              <p className="mt-1.5 text-[13.5px] leading-relaxed text-ink-soft">{lead.rules}</p>
+            </div>
+          </div>
+
+          <div className="mt-3 rounded-xl border border-surface-line p-4">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <p className="flex items-center gap-2 text-[13.5px] font-semibold text-ink">
+                <IconComment className="h-4 w-4 text-ink-faint" />
+                Respuesta pública, lista
+              </p>
+              <span className="text-[12px] text-ink-faint">Tuya para editar</span>
+            </div>
+            <p className="mt-3 text-[14px] leading-relaxed text-ink-soft">{lead.draft}</p>
+            <div className="mt-4 flex flex-wrap items-center gap-3">
+              <button type="button" onClick={handleCopy} className="btn-secondary px-3.5 py-2">
+                {copied ? 'Copiada ✓' : 'Copiar respuesta'}
+              </button>
+              <button type="button" onClick={onAuth} className="btn-primary px-3.5 py-2">
+                Quiero esto para mi producto
+              </button>
+              <span className="text-[12px] text-ink-faint">La pegas tú, en tu Reddit.</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
+  );
+}
+
+/** Subraya la frase que hizo que el post se ganara su nota. */
+function Highlighted({ text, highlight }: { text: string; highlight: string }) {
+  const at = text.indexOf(highlight);
+  if (at === -1) return <>{text}</>;
+  return (
+    <>
+      {text.slice(0, at)}
+      <mark className="box-decoration-clone rounded bg-brand-100/70 px-0.5 text-ink">{highlight}</mark>
+      {text.slice(at + highlight.length)}
+    </>
   );
 }
