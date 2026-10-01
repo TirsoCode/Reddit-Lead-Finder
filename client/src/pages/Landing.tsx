@@ -1,7 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { IconCheck, IconComment, IconLink, IconReddit, IconSearch, IconSparkle, IconUpvote } from '../components/icons';
 import { LogoMark } from '../components/Logo';
-import { HeroScene } from '../components/HeroScene';
 
 interface LandingProps {
   onAuth: () => void;
@@ -113,15 +112,18 @@ export function Landing({ onAuth }: LandingProps) {
       </header>
 
       {/* ---------- Frase principal ---------- */}
-      <section className="relative isolate overflow-hidden bg-[linear-gradient(180deg,#FFFDFB_0%,#FFF6EE_46%,#FFE9DA_100%)]">
-        {/* sol cálido detrás del titular */}
+      <section className="relative isolate overflow-hidden bg-[#DCE9F0]">
+        {/* fondo de la portada */}
         <div
-          aria-hidden
-          className="pointer-events-none absolute left-1/2 top-[-140px] h-[460px] w-[820px] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(255,183,92,0.35),transparent)] blur-[10px]"
+          aria-hidden="true"
+          className="absolute inset-0 bg-[url('/hero-landscape.webp')] bg-cover bg-[position:center_32%]"
         />
 
-        {/* ilustración de la bahía */}
-        <HeroScene className="pointer-events-none absolute inset-x-0 bottom-0 h-[300px] sm:h-[52%] sm:min-h-[340px]" />
+        {/* velo claro: mantiene el titular legible y funde la foto con el color de la página */}
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.82)_0%,rgba(255,255,255,0.66)_36%,rgba(255,251,244,0.36)_55%,rgba(255,246,235,0.1)_72%,rgba(255,246,235,0)_82%)]"
+        />
 
         <div className="relative z-10 mx-auto max-w-[1120px] px-5 pb-[300px] pt-14 text-center sm:px-8 sm:pt-20 sm:pb-[44vh]">
           <h1 className="mx-auto max-w-4xl font-display text-[36px] font-bold leading-[1.06] tracking-[-0.035em] text-ink sm:text-[60px] lg:text-[68px]">
@@ -167,7 +169,7 @@ export function Landing({ onAuth }: LandingProps) {
             </button>
           </form>
 
-          <p className="mt-4 text-sm text-ink-faint">Sin tarjeta. Solo tu email y la URL de tu producto.</p>
+          <p className="mt-4 text-sm text-ink-muted">Sin tarjeta. Solo tu email y la URL de tu producto.</p>
         </div>
       </section>
 
