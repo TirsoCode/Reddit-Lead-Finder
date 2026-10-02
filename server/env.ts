@@ -53,8 +53,42 @@ const schema = z.object({
   OPENROUTER_API_KEY: z.string().min(1, 'OPENROUTER_API_KEY es obligatoria'),
   OPENROUTER_MODEL: z.string().default('qwen/qwen3.8-27b:free'),
   OPENROUTER_SCORING_MODEL: z.string().optional(),
+  /**
+   * Modelos de reserva, en orden de preferencia y separados por comas.
+   *
+   * Los modelos `:free` de OpenRouter no tienen servicio garantizado: cuando su
+   * proveedor se satura devuelven 429, y a veces un 200 con el cuerpo vacío.
+   * `services/ai.ts` va bajando por esta lista hasta que uno conteste, así que
+   * solo hace falta que haya más de uno.
+   *
+   * La lista viene de probar los 17 modelos gratuitos que había al escribir esto:
+   * se descartaron los que solo devuelven texto vacío, los de código
+   * (`poolside/laguna-*`, `cohere/north-mini-code`), el clasificador de seguridad
+   * `nemotron-3.5-content-safety`, los `inkling` (403 fuera de un "agentic
+   * harness") y `nemotron-3.5-lightning`, que tardaba 98 segundos en responder.
+   */
+  OPENROUTER_FALLBACK_MODELS: z
+    .string()
+    .default(
+      [
+        'google/gemma-4-31b-it:free',
+        'dots-studio/dots-3-note-preview:free',
+        'nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free',
+        'google/gemma-4-26b-a4b-it:free',
+        'inclusionai/ling-3.0-flash-sante:free',
+        'liquid/lfm-2.5-2.6b:free',
+      ].join(','),
+    ),
   OPENROUTER_SITE_URL: z.string().optional(),
   OPENROUTER_APP_NAME: z.string().default('RedditLeads'),
+
+  /**
+   * Horas que se conserva el catálogo de modelos gratuitos antes de volver a
+   * descargarlo de OpenRouter. La respuesta pesa casi 800 kB y las invocaciones
+   * de Edge Functions arrancan en frío, así que se guarda en la base de datos
+   * (`services/aiModels.ts`).
+   */
+  AI_CATALOGUE_TTL_HOURS: intish(6),
 
   CRON_SCHEDULE: z.string().default('0 8,20 * * *'),
   CRON_ENABLED: boolish(true),
@@ -82,6 +116,10 @@ export const env = {
   ...raw,
   isProd: raw.NODE_ENV === 'production',
   scoringModel: raw.OPENROUTER_SCORING_MODEL || raw.OPENROUTER_MODEL,
+  /** `OPENROUTER_FALLBACK_MODELS` ya limpio: sin espacios ni entradas vacías. */
+  fallbackModels: raw.OPENROUTER_FALLBACK_MODELS.split(',')
+    .map((model) => model.trim())
+    .filter(Boolean),
 } as const;
 
 export type Env = typeof env;

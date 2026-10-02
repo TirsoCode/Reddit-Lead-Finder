@@ -6,7 +6,6 @@ import { createLogger } from './logger.js';
 import { leadsRouter } from './routes/leads.js';
 import { profileRouter } from './routes/profile.js';
 import { statsRouter } from './routes/stats.js';
-import { aiRouter } from './routes/ai.js';
 import { startScheduler } from './services/scheduler.js';
 
 const log = createLogger('server');
@@ -45,7 +44,6 @@ export function createApp() {
   app.use('/api/profile', profileRouter);
   app.use('/api/leads', leadsRouter);
   app.use('/api/stats', statsRouter);
-  app.use('/api/ai', aiRouter);
 
   app.use('/api', (_req, _res, next) => {
     next(HttpError.notFound('Ese endpoint no existe'));
@@ -68,7 +66,9 @@ export function createApp() {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   app.use((error: unknown, _req: Request, res: Response, _next: NextFunction) => {
     if (error instanceof HttpError) {
-      res.status(error.status).json({ error: error.message, code: error.code, details: error.details });
+      // `details` no sale: a veces es el cuerpo de la respuesta del proveedor de
+      // IA y solo el log del servidor lo necesita. El cliente ya lo ignoraba.
+      res.status(error.status).json({ error: error.message, code: error.code });
       return;
     }
 

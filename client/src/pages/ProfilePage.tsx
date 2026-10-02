@@ -2,7 +2,6 @@ import { useEffect, useState, type FormEvent } from 'react';
 import { api, ApiError, type Profile, type ScanRun, type Tone } from '../lib/api';
 import { cx, formatDateTime, timeAgo, TONE_DESCRIPTIONS, TONE_LABELS } from '../lib/format';
 import { Spinner } from '../components/ui';
-import { AiStatusCard } from '../components/AiStatusCard';
 import { IconCheck, IconRefresh, IconSparkle } from '../components/icons';
 
 interface ProfilePageProps {
@@ -232,9 +231,6 @@ export function ProfilePage({ profile, runs, onProfileChange }: ProfilePageProps
           </div>
         )}
       </section>
-
-      {/* Estado de la IA */}
-      <AiStatusCard />
 
       {/* Historial */}
       <section className="card p-5 sm:p-6">

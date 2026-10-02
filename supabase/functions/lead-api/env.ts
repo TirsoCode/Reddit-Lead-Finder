@@ -72,8 +72,37 @@ const schema = z.object({
   OPENROUTER_API_KEY: z.string().min(1, 'OPENROUTER_API_KEY es obligatoria'),
   OPENROUTER_MODEL: z.string().default('qwen/qwen3.8-27b:free'),
   OPENROUTER_SCORING_MODEL: z.string().optional(),
+  /**
+   * Modelos de reserva, en orden de preferencia y separados por comas.
+   *
+   * Los modelos `:free` de OpenRouter no tienen servicio garantizado: cuando su
+   * proveedor se satura devuelven 429, y a veces un 200 con el cuerpo vacío.
+   * `services/ai.ts` va bajando por esta lista hasta que uno conteste, y a
+   * continuación añade los que descubra en el catálogo, así que basta con que
+   * haya más de uno.
+   */
+  OPENROUTER_FALLBACK_MODELS: z
+    .string()
+    .default(
+      [
+        'google/gemma-4-31b-it:free',
+        'dots-studio/dots-3-note-preview:free',
+        'nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free',
+        'google/gemma-4-26b-a4b-it:free',
+        'inclusionai/ling-3.0-flash-sante:free',
+        'liquid/lfm-2.5-2.6b:free',
+      ].join(','),
+    ),
   OPENROUTER_SITE_URL: z.string().optional(),
   OPENROUTER_APP_NAME: z.string().default('RedditLeads'),
+
+  /**
+   * Horas que se conserva el catálogo de modelos gratuitos antes de volver a
+   * descargarlo de OpenRouter. La respuesta pesa casi 800 kB y las invocaciones
+   * de Edge Functions arrancan en frío, así que se guarda en la base de datos
+   * (`services/aiModels.ts`).
+   */
+  AI_CATALOGUE_TTL_HOURS: intish(6),
 
   /**
    * La búsqueda programada la dispara `pg_cron` llamando a `POST /api/cron`.
@@ -110,6 +139,10 @@ export const env = {
   ...raw,
   isProd: true,
   scoringModel: raw.OPENROUTER_SCORING_MODEL || raw.OPENROUTER_MODEL,
+  /** `OPENROUTER_FALLBACK_MODELS` ya limpio: sin espacios ni entradas vacías. */
+  fallbackModels: raw.OPENROUTER_FALLBACK_MODELS.split(',')
+    .map((model) => model.trim())
+    .filter(Boolean),
   /** Orígenes permitidos, ya normalizados y sin la barra final. */
   allowedOrigins: raw.ALLOWED_ORIGINS.split(',')
     .map((origin) => origin.trim().replace(/\/+$/, ''))

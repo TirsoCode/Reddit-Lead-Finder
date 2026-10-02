@@ -70,8 +70,12 @@ function AppContent() {
   }
 
   return (
-    <Layout email={session.email} newLeads={pendingReplies} onSignOut={() => void handleSignOut()}>
-      <Routes>
+    <Routes>
+      {/* La portada pública también existe con sesión iniciada: es a donde lleva el logo del panel. */}
+      <Route path="/portada" element={<Landing onAuth={() => navigate('/')} sessionActive />} />
+      <Route
+        element={<Layout email={session.email} newLeads={pendingReplies} onSignOut={() => void handleSignOut()} />}
+      >
         <Route
           path="/"
           element={
@@ -84,7 +88,7 @@ function AppContent() {
         />
         <Route path="/perfil" element={<ProfilePage profile={profile} runs={runs} onProfileChange={refreshProfile} />} />
         <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </Layout>
+      </Route>
+    </Routes>
   );
 }

@@ -15,6 +15,11 @@ import { copyToClipboard, cx, relevanceTone } from '../lib/format';
 
 interface LandingProps {
   onAuth: () => void;
+  /**
+   * Con sesión abierta la portada se visita desde el panel (el logo lleva aquí),
+   * así que los botones de acceso devuelven al panel en vez de al formulario.
+   */
+  sessionActive?: boolean;
 }
 
 /** Los tres avisos que tranquilizan antes de registrarse. */
@@ -278,7 +283,7 @@ const PARA_QUE_NO = [
   'Tu producto no encaja en Reddit y en la cola no va a aparecer nadie.',
 ];
 
-export function Landing({ onAuth }: LandingProps) {
+export function Landing({ onAuth, sessionActive = false }: LandingProps) {
   const [openFaq, setOpenFaq] = useState<number | null>(0);
   const [productUrl, setProductUrl] = useState('');
 
@@ -325,16 +330,24 @@ export function Landing({ onAuth }: LandingProps) {
 
           <div className="flex items-center gap-1 sm:gap-3">
             <ThemeToggle />
-            <button
-              type="button"
-              onClick={onAuth}
-              className="focus-ring rounded-lg px-3 py-2 text-sm font-medium text-ink-soft transition hover:text-ink dark:text-neutral-300 dark:hover:text-neutral-100"
-            >
-              Entrar
-            </button>
-            <button type="button" onClick={onAuth} className="btn-primary px-4 py-2.5 text-sm">
-              Encuentra mi primer lead
-            </button>
+            {sessionActive ? (
+              <button type="button" onClick={onAuth} className="btn-primary px-4 py-2.5 text-sm">
+                Ir a mi panel
+              </button>
+            ) : (
+              <>
+                <button
+                  type="button"
+                  onClick={onAuth}
+                  className="focus-ring rounded-lg px-3 py-2 text-sm font-medium text-ink-soft transition hover:text-ink dark:text-neutral-300 dark:hover:text-neutral-100"
+                >
+                  Entrar
+                </button>
+                <button type="button" onClick={onAuth} className="btn-primary px-4 py-2.5 text-sm">
+                  Encuentra mi primer lead
+                </button>
+              </>
+            )}
           </div>
         </div>
       </header>

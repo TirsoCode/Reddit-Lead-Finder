@@ -23,7 +23,6 @@ import {
   refreshReply,
   runScan,
 } from './services/pipeline.ts';
-import { checkAiHealth } from './services/ai.ts';
 import { runScheduledBatch } from './services/scheduler.ts';
 import type { LeadStatus, Tone } from './types.ts';
 
@@ -72,7 +71,7 @@ router.get('/', ({ json }) =>
   json({
     service: 'reddit-leads-api',
     runtime: 'deno/edge',
-    endpoints: ['/api/health', '/api/profile', '/api/leads', '/api/stats', '/api/ai/status'],
+    endpoints: ['/api/health', '/api/profile', '/api/leads', '/api/stats', '/api/cron'],
   }),
 );
 
@@ -239,17 +238,6 @@ router.get('/api/stats', async ({ req, json }) => {
   return json({ stats });
 });
 
-// --- Estado de la IA -------------------------------------------------------
-
-/**
- * La interfaz lo llama para poder decir "la IA está conectada" (o qué le falta)
- * sin que haya que fallar al analizar una web entera para enterarse.
- */
-router.get('/api/ai/status', async ({ req, json }) => {
-  await requireAuth(req);
-  return json({ ai: await checkAiHealth() });
-});
-
 // --- Búsqueda programada ---------------------------------------------------
 
 /**
@@ -305,10 +293,9 @@ function corsHeaders(origin: string | null): Record<string, string> {
 /** El equivalente al middleware de errores de `server/index.ts`. */
 function errorResponse(error: unknown): Response {
   if (error instanceof HttpError) {
-    return Response.json(
-      { error: error.message, code: error.code, details: error.details },
-      { status: error.status },
-    );
+    // `details` no sale: a veces es el cuerpo de la respuesta del proveedor de
+    // IA y solo el log del servidor lo necesita. El cliente ya lo ignoraba.
+    return Response.json({ error: error.message, code: error.code }, { status: error.status });
   }
 
   log.error('Error no controlado', error);

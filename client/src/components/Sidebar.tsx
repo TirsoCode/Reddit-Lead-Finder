@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 import { cx } from '../lib/format';
 import { IconClose, IconDashboard, IconLogout } from './icons';
 import { Logo } from './Logo';
@@ -40,7 +40,15 @@ export function Sidebar({ items, email, onSignOut, mobileOpen, onCloseMobile }: 
         )}
       >
         <div className="flex h-16 items-center justify-between px-5">
-          <Logo />
+          <Link
+            to="/portada"
+            onClick={onCloseMobile}
+            aria-label="Ir a la portada"
+            title="Ir a la portada"
+            className="focus-ring -m-1 rounded-lg p-1 transition hover:opacity-75"
+          >
+            <Logo />
+          </Link>
           <button
             type="button"
             onClick={onCloseMobile}
