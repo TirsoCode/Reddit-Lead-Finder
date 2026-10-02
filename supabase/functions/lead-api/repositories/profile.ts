@@ -1,5 +1,5 @@
-import { query, queryOne } from '../db.js';
-import type { ProductAnalysis, Profile, Tone } from '../types.js';
+import { query, queryOne } from '../db.ts';
+import type { ProductAnalysis, Profile, Tone } from '../types.ts';
 
 /** Crea el perfil si el trigger de Supabase aún no lo ha hecho (registro social). */
 export async function ensureProfile(userId: string): Promise<Profile> {

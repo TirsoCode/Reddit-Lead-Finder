@@ -20,6 +20,8 @@
     "db:link": "supabase link",
     "db:push": "supabase db push",
     "db:status": "supabase migration list",
+    "fn:deploy": "supabase functions deploy lead-api",
+    "fn:list": "supabase functions list",
     "scan": "tsx server/scripts/scan.ts",
     "cron": "tsx server/scripts/cron.ts",
     "client:deploy": "vercel deploy --prod"
