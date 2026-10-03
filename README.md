@@ -97,11 +97,36 @@ npm run db:push
    Para Google, mete el client id y el secret que te dé Google Cloud Console y añade
    `http://localhost:5173` y tu dominio a las URLs de redirección permitidas.
 
-### 2. Reddit — app de script
+### 2. Reddit — acceso al Data API (requiere aprobación)
 
-1. En [reddit.com/prefs/apps](https://www.reddit.com/prefs/apps) pulsa **create another app**.
-2. Tipo **script**. Reddit muestra un *client id* corto y un *secret*.
-3. El *User-Agent* es obligatorio y debe tener esta forma: `web:reddit-leads:1.0.0 (by /u/TU_USUARIO)`.
+**Esto ya no se puede hacer por cuenta propia.** Desde diciembre de 2025 Reddit canceló el acceso
+self-service: entrar en [reddit.com/prefs/apps](https://www.reddit.com/prefs/apps) y pulsar
+*create another app* devuelve el aviso de la
+[Responsible Builder Policy](https://support.reddithelp.com/hc/en-us/articles/42728983564564-Responsible-Builder-Policy)
+en lugar de credenciales.
+
+Ojo con la trampa: hay **dos registros distintos** y solo uno da credenciales.
+
+| Registro | Qué te da |
+|---|---|
+| Registro de app / perfil en `developers.reddit.com` | La etiqueta de bot. **Sin** client id ni secret |
+| Solicitud de acceso al Data API | El `client id` y el `secret` que necesita `services/reddit.ts` |
+
+Según la misma política, el uso **no comercial** se pide con el formulario de acceso al Data API,
+pero el **comercial** exige un acuerdo por escrito aparte, y este producto es comercial. En los
+foros de `r/redditdev` hay quien cuenta que le rechazaron la solicitud comercial varias veces con
+respuestas genéricas, así que conviene tener un plan B.
+
+El nivel gratuito que existe sigue siendo de 100 consultas/min por cliente OAuth, pero **no es
+self-service**: requiere la aprobación de antes. Cuando llegue, `services/reddit.ts` va a 80/min.
+
+Tampoco se puede sustituir por scraping: la política prohíbe expresamente el scraping sin
+aprobación, y en la práctica `old.reddit.com` manda a `/login` a los visitantes anónimos y en
+`www.reddit.com` los resultados se pintan con JavaScript.
+
+Mientras tanto, la app **arranca y funciona**: el perfil se analiza y las replied se generan, solo
+que no entra ningún post de Reddit. En **Perfil → Conexión con la IA** te dirá si Reddit está
+listo o no.
 
 ### 3. OpenRouter — IA
 
@@ -222,7 +247,7 @@ Hasta que se metan estas dos claves la web funciona, pero **sin datos**:
 
 | Falta | Qué pasa | Cómo se arregla |
 |---|---|---|
-| `REDDIT_CLIENT_ID` / `REDDIT_CLIENT_SECRET` | No entra ningún post. El perfil sí se analiza. | [reddit.com/prefs/apps](https://www.reddit.com/prefs/apps) → *script* app, y `supabase secrets set` otra vez |
+| `REDDIT_CLIENT_ID` / `REDDIT_CLIENT_SECRET` | No entra ningún post. El perfil sí se analiza. | Hace falta la aprobación del Data API (ver paso 2): rellena los dos valores cuando Reddit la conceda |
 | Google OAuth | Solo se puede entrar con email | Authentication → Providers → Google, con el client id y secret de Google Cloud |
 
 ---
