@@ -63,6 +63,7 @@ const schema = z.object({
    */
   ALLOWED_ORIGINS: z.string().default('https://reddit-lead-finder-ecru.vercel.app'),
 
+  REDDIT_ENABLED: boolish(false),
   REDDIT_CLIENT_ID: z.string().min(1, 'REDDIT_CLIENT_ID es obligatoria'),
   REDDIT_CLIENT_SECRET: z.string().min(1, 'REDDIT_CLIENT_SECRET es obligatoria'),
   REDDIT_USER_AGENT: z.string().default('web:reddit-leads:1.0.0'),
@@ -186,8 +187,13 @@ export function describeIntegrations(): Array<{ name: string; ready: boolean; de
     },
     {
       name: 'reddit',
-      ready: !isPlaceholderSecret(raw.REDDIT_CLIENT_ID) && !isPlaceholderSecret(raw.REDDIT_CLIENT_SECRET),
-      detail: `API oficial · ${raw.REDDIT_WINDOW_HOURS} h de ventana`,
+      ready:
+        raw.REDDIT_ENABLED &&
+        !isPlaceholderSecret(raw.REDDIT_CLIENT_ID) &&
+        !isPlaceholderSecret(raw.REDDIT_CLIENT_SECRET),
+      detail: raw.REDDIT_ENABLED
+        ? `API oficial · ${raw.REDDIT_WINDOW_HOURS} h de ventana`
+        : 'API oficial · deshabilitada temporalmente',
     },
   ];
 }
