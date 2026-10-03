@@ -35,7 +35,7 @@ export function StatCard({
           <span
             className={cx(
               'shrink-0 text-xs font-medium tabular-nums',
-              delta.direction === 'up' && 'text-emerald-600 dark:text-emerald-400',
+              delta.direction === 'up' && 'text-emerald-700 dark:text-emerald-400',
               delta.direction === 'down' && 'text-brand-600 dark:text-brand-400',
               delta.direction === 'flat' && 'text-ink-faint dark:text-neutral-500',
             )}
@@ -80,7 +80,7 @@ interface ProgressBarProps {
   value: number;
   max?: number;
   className?: string;
-  tone?: 'brand' | 'emerald';
+  tone?: 'brand' | 'emerald' | 'neutral';
 }
 
 export function ProgressBar({ value, max = 100, className, tone = 'brand' }: ProgressBarProps) {
@@ -90,7 +90,9 @@ export function ProgressBar({ value, max = 100, className, tone = 'brand' }: Pro
       <div
         className={cx(
           'h-full rounded-full transition-[width] duration-500',
-          tone === 'brand' ? 'bg-brand-500' : 'bg-emerald-500',
+          tone === 'brand' && 'bg-brand-500',
+          tone === 'emerald' && 'bg-emerald-500',
+          tone === 'neutral' && 'bg-ink-faint dark:bg-neutral-600',
         )}
         style={{ width: `${percent}%` }}
       />

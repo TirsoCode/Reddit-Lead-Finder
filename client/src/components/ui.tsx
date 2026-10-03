@@ -226,7 +226,9 @@ export function SectionCard({
             </p>
           ) : null}
         </div>
-        {action ? <div className="flex shrink-0 items-center gap-2">{action}</div> : null}
+        {/* Sin `shrink-0`: en pantallas estrechas la zona de filtros baja a su
+            propia línea en vez de empujar la tarjeta. */}
+        {action ? <div className="flex min-w-0 flex-wrap items-center gap-2">{action}</div> : null}
       </div>
       <div className={dense ? 'px-5 pb-5 pt-4' : 'p-5'}>{children}</div>
     </section>

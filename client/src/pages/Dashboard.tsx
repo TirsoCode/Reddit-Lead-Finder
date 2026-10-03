@@ -29,14 +29,12 @@ import {
   CardSkeleton,
   EmptyState,
   ErrorNote,
-  IconLink,
-  IconSparkle,
   SectionCard,
   Segmented,
   SuccessNote,
   Toggle,
 } from '../components/ui';
-import { IconClock, IconFlame } from '../components/icons';
+import { IconClock, IconFlame, IconLink, IconSparkle } from '../components/icons';
 
 interface DashboardProps {
   profile: Profile | null;
@@ -89,7 +87,7 @@ export function Dashboard({ profile, runs, onProfileChange, onOpenLeads }: Dashb
   const [metric, setMetric] = useState<ChartMetric>(() =>
     readPreference<ChartMetric>(STORAGE_KEYS.chartMetric, 'count'),
   );
-  const [compact, setCompact] = useState(() => readPreference(STORAGE_KEYS.density, false));
+  const [compact, setCompact] = useState<boolean>(() => readPreference(STORAGE_KEYS.density, false));
 
   const needsSetup = !profile?.product_url || profile?.analysis_status !== 'ready';
 
@@ -117,6 +115,19 @@ export function Dashboard({ profile, runs, onProfileChange, onOpenLeads }: Dashb
   useEffect(() => {
     void load();
   }, [load]);
+
+  /**
+   * Solo las cifras, sin tocar la lista: al guardar un post la tarjeta se queda
+   * a la vista (con su etiqueta "Guardado") pero los KPIs tienen que cuadrarse.
+   */
+  const refreshStats = useCallback(async () => {
+    try {
+      const { stats: next } = await api.getStats(range);
+      setStats(next);
+    } catch {
+      // Un refresco fallido no puede fastidiar la acción que lo disparó.
+    }
+  }, [range]);
 
   function setChartMetric(next: ChartMetric) {
     setMetric(next);
@@ -245,14 +256,21 @@ export function Dashboard({ profile, runs, onProfileChange, onOpenLeads }: Dashb
     setNotice(null);
     setSuccess(null);
 
+    const [topSubreddit] = [...stats.subreddits].sort((a, b) => b.count - a.count);
     const lines = [
       `Resumen de RedditLeads · ${profile.product_name ?? 'mi producto'}`,
       `Últimos ${stats.days} días: ${stats.period.total} posts encontrados, ${
         stats.period.highScore
       } con relevancia 60 o más (media ${stats.period.averageRelevance ?? '—'}).`,
       `En total llevo ${stats.total} posts: ${stats.byStatus.new} sin tocar, ${stats.byStatus.saved} guardados y ${stats.byStatus.replied} respondidos.`,
-      stats.topSubredditNote,
-      stats.streak > 0 ? `Llevo ${stats.streak} ${stats.streak === 1 ? 'día' : 'días'} seguidos con posts nuevos.` : '',
+      topSubreddit
+        ? `El público aparece sobre todo en r/${topSubreddit.subreddit} (${
+            topSubreddit.count
+          } posts, relevancia media ${topSubreddit.averageRelevance ?? '—'}).`
+        : '',
+      stats.streak > 0
+        ? `Llevo ${stats.streak} ${stats.streak === 1 ? 'día' : 'días'} seguidos con posts nuevos.`
+        : '',
     ].filter(Boolean);
 
     const ok = await copyToClipboard(lines.join('\n'));
@@ -275,6 +293,7 @@ export function Dashboard({ profile, runs, onProfileChange, onOpenLeads }: Dashb
       setTopLeads((current) =>
         current.map((item) => (item.id === leadId ? lead : item)).filter((item) => item.status !== 'dismissed'),
       );
+      void refreshStats();
     } catch (caught) {
       reportActionError(caught, 'No se pudo cambiar el estado del post');
     }
@@ -284,6 +303,7 @@ export function Dashboard({ profile, runs, onProfileChange, onOpenLeads }: Dashb
     try {
       await api.setLeadStatus(leadId, 'dismissed');
       setTopLeads((current) => current.filter((lead) => lead.id !== leadId));
+      void refreshStats();
     } catch (caught) {
       reportActionError(caught, 'No se pudo descartar el post');
     }
@@ -412,7 +432,7 @@ export function Dashboard({ profile, runs, onProfileChange, onOpenLeads }: Dashb
             : 'Media de relevancia de los posts de cada día.'
         }
         action={
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="flex min-w-0 flex-wrap items-center gap-3">
             <Segmented
               size="sm"
               label="Métrica de la gráfica"
@@ -423,7 +443,7 @@ export function Dashboard({ profile, runs, onProfileChange, onOpenLeads }: Dashb
                 { value: 'relevance', label: 'Relevancia' },
               ]}
             />
-            <div className="w-44">
+            <div className="min-w-0 flex-1 sm:w-44 sm:flex-none">
               <Toggle checked={compact} onChange={setDensity} label="Compacto" hint="Menos aire en las tarjetas" />
             </div>
           </div>
@@ -436,8 +456,10 @@ export function Dashboard({ profile, runs, onProfileChange, onOpenLeads }: Dashb
         )}
       </SectionCard>
 
-      <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
-        <div className="space-y-6">
+      {/* `min-w-0` en las dos columnas: sin eso las tarjetas fijan el ancho mínimo
+          de la rejilla y en móvil aparece scroll horizontal. */}
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
+        <div className="min-w-0 space-y-6">
           {/* Analítica */}
           <div className="grid gap-4 sm:grid-cols-2">
             <SectionCard title="Embudo" description="Qué pasa con los posts después de encontrarlos.">
@@ -479,6 +501,7 @@ export function Dashboard({ profile, runs, onProfileChange, onOpenLeads }: Dashb
                   value={topSort}
                   onChange={(event) => setTopSort(event.target.value)}
                   aria-label="Ordenar oportunidades por"
+                  title="Ordenar por"
                   className="input w-auto py-2 pr-8 text-[13px]"
                 >
                   {TOP_SORTS.map((option) => (
@@ -491,6 +514,7 @@ export function Dashboard({ profile, runs, onProfileChange, onOpenLeads }: Dashb
                   value={topMin}
                   onChange={(event) => setTopMin(Number(event.target.value))}
                   aria-label="Relevancia mínima"
+                  title="Relevancia mínima"
                   className="input w-auto py-2 pr-8 text-[13px]"
                 >
                   {MIN_SCORE_OPTIONS.map((option) => (
@@ -587,7 +611,7 @@ export function Dashboard({ profile, runs, onProfileChange, onOpenLeads }: Dashb
         </div>
 
         {/* Lateral */}
-        <aside className="space-y-4">
+        <aside className="min-w-0 space-y-4">
           <SectionCard title="Acciones rápidas" description="Lo habitual, en un clic." dense>
             <QuickActions
               scanning={scanning}

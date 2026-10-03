@@ -81,7 +81,12 @@ function AppContent() {
         <Route
           path="/"
           element={
-            <Dashboard profile={profile} onProfileChange={refreshProfile} onOpenLeads={() => navigate('/leads')} />
+            <Dashboard
+              profile={profile}
+              runs={runs}
+              onProfileChange={refreshProfile}
+              onOpenLeads={() => navigate('/leads')}
+            />
           }
         />
         <Route

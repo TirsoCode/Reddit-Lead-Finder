@@ -217,8 +217,9 @@ export function PostCard({
             )}
           </div>
 
-          {/* Acciones de gestión */}
-          <div className="mt-3 flex items-center gap-1 border-t border-surface-line pt-2.5 opacity-0 transition group-hover:opacity-100 focus-within:opacity-100 dark:border-neutral-800">
+          {/* Acciones de gestión. En pantallas pequeñas siempre visibles: sin
+              hover no hay forma de saber que están ahí. */}
+          <div className="mt-3 flex flex-wrap items-center gap-1 border-t border-surface-line pt-2.5 opacity-100 transition sm:opacity-0 sm:group-hover:opacity-100 sm:focus-within:opacity-100 dark:border-neutral-800">
             <button
               type="button"
               onClick={() => handleStatus(lead.status === 'saved' ? 'new' : 'saved')}

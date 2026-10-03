@@ -94,7 +94,7 @@ export const STORAGE_KEYS = {
 } as const;
 
 /** Lee una preferencia guardada y, si no hay o está corrupta, devuelve la de inicio. */
-export function readPreference<T extends string | number | boolean>(key: string, fallback: T): T {
+export function readPreference<T>(key: string, fallback: T): T {
   try {
     const raw = window.localStorage.getItem(key);
     if (raw === null) return fallback;
@@ -106,7 +106,8 @@ export function readPreference<T extends string | number | boolean>(key: string,
   }
 }
 
-export function writePreference(key: string, value: string | number | boolean): void {
+/** Admite objetos (las metas), así que el tipo solo se fija al leer. */
+export function writePreference<T>(key: string, value: T): void {
   try {
     window.localStorage.setItem(key, JSON.stringify(value));
   } catch {

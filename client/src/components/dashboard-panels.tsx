@@ -427,12 +427,11 @@ export function SubredditPerformance({ subreddits, fallback = false }: Subreddit
 
       <ul className="space-y-3">
         {rows.map((row) => {
-          const score = row.averageRelevance ?? 0;
           return (
             <li key={row.subreddit} className="group/sr">
               <div className="flex items-baseline justify-between gap-2 text-[13px]">
                 <Link
-                  to={`/leads?buscar=r%2F${row.subreddit}`}
+                  to={`/leads?comunidad=${encodeURIComponent(row.subreddit)}`}
                   className="truncate font-medium text-ink-soft hover:text-brand-600 hover:underline dark:text-neutral-300 dark:hover:text-brand-400"
                   title={`Ver posts de r/${row.subreddit}`}
                 >

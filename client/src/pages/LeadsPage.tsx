@@ -302,6 +302,21 @@ export function LeadsPage({ pendingReplies, onProfileChange }: LeadsPageProps) {
             </option>
           ))}
         </select>
+
+        {/* El filtro de comunidad llega desde el panel: se ve y se quita aquí. */}
+        {subreddit.trim() ? (
+          <span className="pill bg-brand-50 text-brand-700 dark:bg-brand-500/15 dark:text-brand-300">
+            r/{subreddit.trim()}
+            <button
+              type="button"
+              onClick={() => setSubreddit('')}
+              aria-label={`Quitar el filtro de r/${subreddit.trim()}`}
+              className="focus-ring rounded-sm text-brand-500 hover:text-brand-700 dark:hover:text-brand-200"
+            >
+              ×
+            </button>
+          </span>
+        ) : null}
       </div>
 
       {notice ? (
@@ -318,18 +333,19 @@ export function LeadsPage({ pendingReplies, onProfileChange }: LeadsPageProps) {
       ) : leads.length === 0 ? (
         <EmptyState
           icon={<IconLeads className="h-7 w-7" />}
-          title={search ? 'Ningún post coincide' : 'Aquí aparecerán tus leads'}
+          title={search || subreddit ? 'Ningún post coincide' : 'Aquí aparecerán tus leads'}
           description={
-            search
+            search || subreddit || minRelevance > 0 || status !== 'new'
               ? 'Prueba con otras palabras o quita los filtros.'
               : 'Cada 12 horas buscamos en Reddit por ti. También puedes lanzar una búsqueda ahora mismo.'
           }
           action={
-            search ? (
+            search || subreddit || minRelevance > 0 || status !== 'new' ? (
               <button
                 type="button"
                 onClick={() => {
                   setSearchInput('');
+                  setSubreddit('');
                   setStatus('all');
                   setMinRelevance(0);
                 }}

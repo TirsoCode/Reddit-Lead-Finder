@@ -61,6 +61,18 @@ Para cualquier persona que tenga un producto, servicio o proyecto y quiera encon
 - Relevancia media de los posts encontrados
 - Total de posts encontrados desde que empezó a usar la app
 - Gráfica simple de evolución de posts por día
+- Periodo de 7, 30 o 90 días: todas las cifras y las gráficas se recalculan
+- Comparativa con el periodo anterior (subida o bajada) en cada cifra clave
+- Embudo: cuántos posts se encontraron, se guardaron o respondieron
+- Distribución de relevancia en cuatro tramos y horas del día en las que más posts llegan
+- Comunidades y keywords que mejor funcionan, con enlace a los posts de cada una
+- Avisos de salud: análisis fallido, última búsqueda con error, búsqueda que no pasa
+- Cuenta atrás hasta la próxima búsqueda automática y resumen de la última
+- Metas propias del usuario (posts por semana, respuestas escritas) guardadas en su navegador
+- Exportar todos los leads a CSV y copiar un resumen en texto para informes
+- Acciones rápidas (buscar, generar respuestas, exportar) y atajos de teclado: R, S y E
+- Filtros de las mejores oportunidades: orden, relevancia mínima y cuántas se ven
+- Densidad compacta para listas largas
 
 ### Registro y autenticación
 - Registro con email y contraseña
