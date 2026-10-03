@@ -18,7 +18,7 @@ import {
   saveAnalysis,
   setProductUrl,
 } from '../repositories/profile.js';
-import { finishRun, hasRunInFlight, reapStaleRuns, startRun } from '../repositories/runs.js';
+import { finishRun, hasRunInFlight, lastRun, reapStaleRuns, startRun } from '../repositories/runs.js';
 import { HttpError } from '../errors.js';
 import { startOfDayInTimezone } from '../time.js';
 import type { Lead, Profile, RunTrigger, Stats } from '../types.js';
@@ -269,10 +269,45 @@ export async function refreshReply(userId: string, leadId: string): Promise<Lead
   return updated;
 }
 
-export async function getUserStats(userId: string): Promise<Stats> {
+export async function getUserStats(userId: string, days = 30): Promise<Stats> {
   const profile = await ensureProfile(userId);
   const today = startOfDayInTimezone(profile.timezone || 'UTC');
-  return getStats(userId, today);
+
+  const [stats, run] = await Promise.all([
+    getStats(userId, today, days, {
+      timezone: safeTimezone(profile.timezone),
+      keywords: profile.keywords ?? [],
+    }),
+    lastRun(userId),
+  ]);
+
+  if (!run) return stats;
+
+  return {
+    ...stats,
+    lastRun: {
+      status: run.status,
+      started_at: run.started_at,
+      posts_new: run.posts_new,
+      posts_fetched: run.posts_fetched,
+      error: run.error,
+    },
+  };
+}
+
+/**
+ * `at time zone` lanza error si el nombre de la zona no existe en Postgres, así
+ * que se comprueba antes. El perfil ya valida la zona al guardarse, pero un
+ * cambio de versión del catálogo no debería tumbar el panel entero.
+ */
+function safeTimezone(timezone: string | null): string {
+  if (!timezone) return 'UTC';
+  try {
+    new Intl.DateTimeFormat('es-ES', { timeZone: timezone });
+    return timezone;
+  } catch {
+    return 'UTC';
+  }
 }
 
 export async function pendingReplyCount(userId: string): Promise<number> {

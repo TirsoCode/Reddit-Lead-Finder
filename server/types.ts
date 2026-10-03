@@ -76,13 +76,79 @@ export interface ScanRun {
   error: string | null;
 }
 
+/** Un tramo de relevancia, para el histograma del panel. */
+export type RelevanceBucketKey = 'low' | 'mid' | 'good' | 'high';
+
+export interface RelevanceBucket {
+  key: RelevanceBucketKey;
+  label: string;
+  count: number;
+}
+
+/** Rendimiento de una comunidad en el periodo elegido. */
+export interface SubredditStat {
+  subreddit: string;
+  count: number;
+  averageRelevance: number | null;
+  highScore: number;
+}
+
+/** Cuántos posts del periodo mencionan una keyword del perfil. */
+export interface KeywordStat {
+  keyword: string;
+  count: number;
+}
+
+/** Cifras del periodo elegido (7, 30 o 90 días). */
+export interface PeriodStats {
+  total: number;
+  /** Posts con relevancia 60 o más. */
+  highScore: number;
+  /** Posts del periodo sin respuesta generada. */
+  pendingReplies: number;
+  averageRelevance: number | null;
+  averageUpvotes: number | null;
+  averageComments: number | null;
+}
+
 export interface Stats {
   today: number;
   averageRelevance: number | null;
   total: number;
   withReply: number;
+  /** Recuento por estado de todo el histórico: alimenta el embudo. */
+  byStatus: Record<LeadStatus, number>;
+  /** Instante del post más reciente, o `null` si aún no hay ninguno. */
+  lastPostAt: Date | null;
   byDay: Array<{ day: string; count: number; averageRelevance: number | null }>;
-  topSubreddits: Array<{ subreddit: string; count: number }>;
+
+  /** Días del periodo aplicado y su inicio (día local del usuario). */
+  days: number;
+  periodStart: string;
+  period: PeriodStats;
+  /** Periodo inmediatamente anterior, para comparar. */
+  previous: { total: number; averageRelevance: number | null };
+  /** Histograma de relevancia del periodo. */
+  relevance: RelevanceBucket[];
+  /** Posts por hora del día, en la zona horaria del usuario (0–23). */
+  byHour: Array<{ hour: number; count: number }>;
+  subreddits: SubredditStat[];
+  keywords: KeywordStat[];
+  /** Días consecutivos con al menos un post nuevo. */
+  streak: number;
+  /** Última ejecución de búsqueda, para el panel de actividad. */
+  lastRun: {
+    status: RunStatus;
+    started_at: Date;
+    posts_new: number;
+    posts_fetched: number;
+    error: string | null;
+  } | null;
+  /**
+   * El periodo no tiene ningún post, así que los histogramas muestran el
+   * histórico completo. El cliente lo dice para que no parezca un error.
+   */
+  activityFallback: boolean;
 }
 
 export interface RedditPost {

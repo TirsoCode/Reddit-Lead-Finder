@@ -239,3 +239,109 @@ export function IconSun(props: IconProps) {
     </Base>
   );
 }
+
+/** Exportar: flecha que sale de una bandeja. */
+export function IconDownload(props: IconProps) {
+  return (
+    <Base {...props}>
+      <path d="M12 4v10" />
+      <path d="m8 10.5 4 4 4-4" />
+      <path d="M5 17.5v1A1.5 1.5 0 0 0 6.5 20h11a1.5 1.5 0 0 0 1.5-1.5v-1" />
+    </Base>
+  );
+}
+
+/** Diana: los objetivos que se fija el usuario. */
+export function IconTarget(props: IconProps) {
+  return (
+    <Base {...props}>
+      <circle cx="12" cy="12" r="8.5" />
+      <circle cx="12" cy="12" r="4.5" />
+      <circle cx="12" cy="12" r="1" />
+    </Base>
+  );
+}
+
+/** Barras: la analítica del embudo y de las comunidades. */
+export function IconChart(props: IconProps) {
+  return (
+    <Base {...props}>
+      <path d="M4 20h16" />
+      <path d="M7 20v-6" />
+      <path d="M12 20V6" />
+      <path d="M17 20v-9" />
+    </Base>
+  );
+}
+
+/** Llama: los días seguidos con actividad. */
+export function IconFlame(props: IconProps) {
+  return (
+    <Base {...props}>
+      <path d="M12 3.5s4.5 3.5 4.5 7a4.5 4.5 0 0 1-9 0c0-1.6.8-2.9 1.7-3.8.4 1 1.1 1.7 1.9 1.9-.3-2.3.2-3.6.9-5.1Z" />
+      <path d="M20 15.5a8 8 0 0 1-8 5 8 8 0 0 1-6.6-3.5" />
+    </Base>
+  );
+}
+
+/** Aviso: algo pide la atención del usuario. */
+export function IconAlert(props: IconProps) {
+  return (
+    <Base {...props}>
+      <path d="M12 4.5 3.5 19h17L12 4.5Z" />
+      <path d="M12 10v4" />
+      <path d="M12 16.8h.01" />
+    </Base>
+  );
+}
+
+/** Embudo: el filtro por estado y el propio embudo de conversión. */
+export function IconFunnel(props: IconProps) {
+  return (
+    <Base {...props}>
+      <path d="M4 5h16l-6.5 7.5V19l-3 1.5v-8L4 5Z" />
+    </Base>
+  );
+}
+
+/** Rayo: la acción rápida de buscar ahora. */
+export function IconBolt(props: IconProps) {
+  return (
+    <Base {...props}>
+      <path d="M13.5 3 5 13.5h5.5L10 21l8.5-10.5H13L13.5 3Z" />
+    </Base>
+  );
+}
+
+/** Historial: las últimas ejecuciones de búsqueda. */
+export function IconHistory(props: IconProps) {
+  return (
+    <Base {...props}>
+      <path d="M4.5 9.5A8 8 0 1 1 4 12.5" />
+      <path d="M4 4.5v5h5" />
+      <path d="M12 8v4.2l3 1.8" />
+    </Base>
+  );
+}
+
+/** Etiqueta: las keywords que más posts traen. */
+export function IconTag(props: IconProps) {
+  return (
+    <Base {...props}>
+      <path d="M11 4H5.5A1.5 1.5 0 0 0 4 5.5V11l8.5 8.5a1.5 1.5 0 0 0 2.1 0l4.4-4.4a1.5 1.5 0 0 0 0-2.1L11 4Z" />
+      <path d="M8 8h.01" />
+    </Base>
+  );
+}
+
+/** Community: las comunidades donde aparece el público. */
+export function IconCommunity(props: IconProps) {
+  return (
+    <Base {...props}>
+      <circle cx="9" cy="9" r="3" />
+      <circle cx="17" cy="10.5" r="2.5" />
+      <path d="M3.5 19a5.5 5.5 0 0 1 11 0" />
+      <path d="M15 16.4A4.4 4.4 0 0 1 20.5 19" />
+    </Base>
+  );
+}

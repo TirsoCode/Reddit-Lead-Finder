@@ -26,6 +26,8 @@ interface PostCardProps {
   onStatusChange: (leadId: string, status: LeadStatus) => Promise<void>;
   onDismiss: (leadId: string) => Promise<void>;
   generating?: boolean;
+  /** Menos aire y sin borde de hover: para listas largas del panel. */
+  compact?: boolean;
 }
 
 export function PostCard({
@@ -34,6 +36,7 @@ export function PostCard({
   onStatusChange,
   onDismiss,
   generating = false,
+  compact = false,
 }: PostCardProps) {
   const [replyOpen, setReplyOpen] = useState(Boolean(lead.reply));
   const [copied, setCopied] = useState(false);
@@ -78,7 +81,13 @@ export function PostCard({
   }
 
   return (
-    <article className="card group p-4 transition hover:border-ink-faint/60 dark:hover:border-neutral-600">
+    <article
+      className={cx(
+        'card group transition',
+        compact ? 'p-3.5' : 'p-4',
+        'hover:border-ink-faint/60 dark:hover:border-neutral-600',
+      )}
+    >
       <div className="flex gap-4">
         <ScoreBadge score={lead.relevance} />
 

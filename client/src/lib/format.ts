@@ -47,6 +47,73 @@ export function compactNumber(value: number): string {
   return `${(value / 1_000_000).toFixed(1).replace('.', ',')} M`;
 }
 
+/** "1,2 mil" no sirve para un contador de tarjetas: aquí va entero con separador. */
+export function formatCount(value: number | null | undefined): string {
+  if (value === null || value === undefined || !Number.isFinite(value)) return '0';
+  return new Intl.NumberFormat('es-ES').format(Math.round(value));
+}
+
+/** 42 de 100 → "42 %". Los nulos salen como guion, no como 0 %. */
+export function formatPercent(part: number, total: number, digits = 0): string {
+  if (!total) return '—';
+  return `${new Intl.NumberFormat('es-ES', {
+    style: 'percent',
+    minimumFractionDigits: digits,
+    maximumFractionDigits: digits,
+  }).format(part / total)}`;
+}
+
+/** La variación de un KPI: cuánto sube o baja frente al periodo anterior. */
+export interface Delta {
+  /** Puntos porcentuales de diferencia, ya redondeados. */
+  points: number;
+  label: string;
+  direction: 'up' | 'down' | 'flat';
+}
+
+/**
+ * Compara dos cifras y devuelve la variación legible. Cuando el periodo
+ * anterior estaba vacío no hay con qué comparar, así que devuelve `null`.
+ */
+export function computeDelta(current: number, previous: number, digits = 0): Delta | null {
+  if (previous <= 0) return null;
+  const change = ((current - previous) / previous) * 100;
+  const rounded = Math.round(change * 10 ** digits) / 10 ** digits;
+  return {
+    points: rounded,
+    label: `${rounded > 0 ? '+' : ''}${rounded.toFixed(digits).replace('.', ',')} %`,
+    direction: rounded > 0 ? 'up' : rounded < 0 ? 'down' : 'flat',
+  };
+}
+
+/** Traduce las claves de `localStorage` de este navegador. */
+export const STORAGE_KEYS = {
+  goals: 'reddit-leads:goals',
+  density: 'reddit-leads:densidad',
+  chartMetric: 'reddit-leads:metrica',
+} as const;
+
+/** Lee una preferencia guardada y, si no hay o está corrupta, devuelve la de inicio. */
+export function readPreference<T extends string | number | boolean>(key: string, fallback: T): T {
+  try {
+    const raw = window.localStorage.getItem(key);
+    if (raw === null) return fallback;
+    const parsed: unknown = JSON.parse(raw);
+    return typeof parsed === typeof fallback ? (parsed as T) : fallback;
+  } catch {
+    // Modo privado, cuota llena o JSON roto: la app sigue con el valor por defecto.
+    return fallback;
+  }
+}
+
+export function writePreference(key: string, value: string | number | boolean): void {
+  try {
+    window.localStorage.setItem(key, JSON.stringify(value));
+  } catch {
+    // Si no se puede guardar, la preferencia solo dura esta visita.
+  }
+}
+
 /** Colorea la puntuación: rojo = oportunidad, gris = poco relevante. */
 export function relevanceTone(relevance: number | null): string {
   if (relevance === null) return 'bg-surface-muted text-ink-faint dark:bg-neutral-800 dark:text-neutral-400';

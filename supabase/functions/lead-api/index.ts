@@ -7,10 +7,12 @@ import { createContext, Router, type RouteContext } from './http/router.ts';
 import { requireAuth, requireCronSecret } from './auth.ts';
 import {
   countLeads,
+  deleteByStatus,
   deleteLead,
   getLead,
   listLeads,
   setStatus,
+  setStatusBulk,
   topScoredLeads,
 } from './repositories/leads.ts';
 import { ensureProfile, setTimezone, setTone } from './repositories/profile.ts';
@@ -39,6 +41,13 @@ const log = createLogger('api');
 
 const STATUSES: ReadonlySet<string> = new Set(['new', 'saved', 'replied', 'dismissed', 'all']);
 const MAX_BODY_BYTES = 256 * 1024;
+
+/** Los ids viajan como `uuid[]`: se filtran los que no lo son para que el error sea del 400. */
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/** Periodos que ofrece el panel. Cualquier otro valor se recorta a este rango. */
+const MIN_DAYS = 1;
+const MAX_DAYS = 365;
 
 const toneSchema = z.enum(['conversational', 'professional', 'friendly']);
 const timezoneSchema = z
@@ -158,6 +167,40 @@ router.post('/api/profile/replies', async ({ req, json }) => {
 
 // --- Leads -----------------------------------------------------------------
 
+/**
+ * Vacía una pila entera de golpe. Solo se permite `dismissed`: es la única
+ * acción destructiva que tiene sentido ("descarté 200 posts, sácame de aquí").
+ *
+ * Va declarada antes de `/api/leads/:id` a propósito: el enrutador prueba las
+ * rutas en orden, y `bulk` se leería como un id si llegara después.
+ */
+router.delete('/api/leads', async ({ req, url, json }) => {
+  const auth = await requireAuth(req);
+  const status = url.searchParams.get('status') ?? '';
+  if (status !== 'dismissed') {
+    throw HttpError.badRequest('Solo se pueden borrar los posts descartados');
+  }
+  const deleted = await deleteByStatus(auth.userId, 'dismissed');
+  return json({ deleted });
+});
+
+/** Aplica un estado a varios posts de una vez (acciones en bloque del panel). */
+router.post('/api/leads/bulk', async ({ req, json }) => {
+  const auth = await requireAuth(req);
+  const body = z
+    .object({
+      ids: z.array(z.string()).min(1).max(100),
+      status: z.enum(['new', 'saved', 'replied', 'dismissed']),
+    })
+    .safeParse(await readJson(req));
+
+  if (!body.success) throw HttpError.badRequest('Selecciona posts y un estado válido');
+
+  const ids = body.data.ids.filter((id) => UUID.test(id));
+  const updated = await setStatusBulk(auth.userId, ids, body.data.status);
+  return json({ updated });
+});
+
 router.get('/api/leads', async ({ req, url, json }) => {
   const auth = await requireAuth(req);
   const query = url.searchParams;
@@ -178,11 +221,13 @@ router.get('/api/leads', async ({ req, url, json }) => {
   const limit = Math.min(100, Math.max(1, Number.parseInt(query.get('limit') ?? '25', 10) || 25));
   const offset = Math.max(0, Number.parseInt(query.get('offset') ?? '0', 10) || 0);
   const search = query.get('search') ?? undefined;
+  const subreddit = query.get('subreddit') ?? undefined;
 
   const filters = {
     status: status as LeadStatus | 'all',
     minRelevance: Number.isFinite(minRelevance) ? minRelevance : undefined,
     search,
+    subreddit,
     sort,
   };
 
@@ -231,10 +276,17 @@ router.post('/api/leads/:id/reply', async ({ req, params, json }) => {
 
 // --- Estadísticas ----------------------------------------------------------
 
-router.get('/api/stats', async ({ req, json }) => {
+/** `?days=7|30|90`: los días que abarca el panel. Por defecto, 30. */
+function parseDays(raw: string | null): number {
+  const parsed = Number.parseInt(raw ?? '30', 10);
+  if (!Number.isFinite(parsed)) return 30;
+  return Math.min(MAX_DAYS, Math.max(MIN_DAYS, parsed));
+}
+
+router.get('/api/stats', async ({ req, url, json }) => {
   const auth = await requireAuth(req);
   await ensureProfile(auth.userId);
-  const stats = await getUserStats(auth.userId);
+  const stats = await getUserStats(auth.userId, parseDays(url.searchParams.get('days')));
   return json({ stats });
 });
 

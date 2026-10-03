@@ -260,7 +260,7 @@ const DAY = [
   {
     time: '12:00',
     title: 'Contestamos a un par de hilos',
-    body: 'Diez minutos. Sin想一想 si puedes mencionar tu producto: la ficha te lo dice antes.',
+    body: 'Diez minutos. Sin preocuparte por si puedes mencionar tu producto: la ficha te lo dice antes.',
   },
   {
     time: '20:00',
@@ -283,6 +283,15 @@ const PARA_QUE_NO = [
   'Tu producto no encaja en Reddit y en la cola no va a aparecer nadie.',
 ];
 
+/**
+ * Enlace del menú superior. `whitespace-nowrap` es lo que impide que una
+ * etiqueta se parta en dos líneas cuando la barra se queda sin ancho:
+ * si algo no cabe, se oculta el enlace (ver `hidden lg:flex` / `hidden xl:flex`)
+ * en vez de cortar el texto.
+ */
+const NAV_LINK =
+  'whitespace-nowrap text-sm text-ink-muted transition hover:text-ink dark:text-neutral-400 dark:hover:text-neutral-100';
+
 export function Landing({ onAuth, sessionActive = false }: LandingProps) {
   const [openFaq, setOpenFaq] = useState<number | null>(0);
   const [productUrl, setProductUrl] = useState('');
@@ -296,42 +305,46 @@ export function Landing({ onAuth, sessionActive = false }: LandingProps) {
     <div className="min-h-screen bg-white dark:bg-neutral-950">
       {/* ---------- Cabecera ---------- */}
       <header className="sticky top-0 z-30 border-b border-[#F2E4D8] bg-[#FFF7F0]/85 backdrop-blur-md dark:border-neutral-800 dark:bg-neutral-900/85">
-        <div className="mx-auto flex h-16 max-w-[1440px] items-center justify-between px-5 sm:px-8">
-          <span className="flex items-center gap-2.5">
+        <div className="mx-auto flex h-16 max-w-[1440px] items-center justify-between gap-3 px-5 sm:px-8">
+          <span className="flex shrink-0 items-center gap-2.5">
             <LogoMark className="h-7 w-7" />
-            <span className="font-display text-[15px] font-bold tracking-tight text-ink dark:text-neutral-100">
+            <span className="hidden font-display text-[15px] font-bold tracking-tight text-ink sm:inline dark:text-neutral-100">
               Reddit<span className="text-brand-500">Leads</span>
             </span>
           </span>
 
-          <nav className="hidden items-center gap-7 md:flex xl:gap-8">
-            <a href="#problema" className="text-sm text-ink-muted transition hover:text-ink dark:text-neutral-400 dark:hover:text-neutral-100">
+          <nav className="hidden shrink-0 items-center gap-5 md:flex lg:gap-6 xl:gap-7">
+            <a href="#problema" className={cx(NAV_LINK, 'hidden xl:block')}>
               El problema
             </a>
-            <a href="#como" className="text-sm text-ink-muted transition hover:text-ink dark:text-neutral-400 dark:hover:text-neutral-100">
+            <a href="#como" className={NAV_LINK}>
               Cómo funciona
             </a>
-            <a href="#cola" className="text-sm text-ink-muted transition hover:text-ink dark:text-neutral-400 dark:hover:text-neutral-100">
+            <a href="#cola" className={NAV_LINK}>
               La cola de hoy
             </a>
-            <a href="#nota" className="text-sm text-ink-muted transition hover:text-ink dark:text-neutral-400 dark:hover:text-neutral-100">
+            <a href="#nota" className={cx(NAV_LINK, 'hidden xl:block')}>
               La nota
             </a>
-            <a href="#dia" className="text-sm text-ink-muted transition hover:text-ink dark:text-neutral-400 dark:hover:text-neutral-100">
+            <a href="#dia" className={cx(NAV_LINK, 'hidden xl:block')}>
               Un día
             </a>
-            <a href="#para-quien" className="text-sm text-ink-muted transition hover:text-ink dark:text-neutral-400 dark:hover:text-neutral-100">
+            <a href="#para-quien" className={cx(NAV_LINK, 'hidden lg:block')}>
               Para quién es
             </a>
-            <a href="#faq" className="text-sm text-ink-muted transition hover:text-ink dark:text-neutral-400 dark:hover:text-neutral-100">
+            <a href="#faq" className={cx(NAV_LINK, 'hidden lg:block')}>
               Preguntas
             </a>
           </nav>
 
-          <div className="flex items-center gap-1 sm:gap-3">
+          <div className="flex shrink-0 items-center gap-1 sm:gap-3">
             <ThemeToggle />
             {sessionActive ? (
-              <button type="button" onClick={onAuth} className="btn-primary px-4 py-2.5 text-sm">
+              <button
+                type="button"
+                onClick={onAuth}
+                className="btn-primary whitespace-nowrap px-4 py-2.5 text-sm"
+              >
                 Ir a mi panel
               </button>
             ) : (
@@ -339,12 +352,17 @@ export function Landing({ onAuth, sessionActive = false }: LandingProps) {
                 <button
                   type="button"
                   onClick={onAuth}
-                  className="focus-ring rounded-lg px-3 py-2 text-sm font-medium text-ink-soft transition hover:text-ink dark:text-neutral-300 dark:hover:text-neutral-100"
+                  className="focus-ring hidden whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium text-ink-soft transition hover:text-ink lg:inline-flex dark:text-neutral-300 dark:hover:text-neutral-100"
                 >
                   Entrar
                 </button>
-                <button type="button" onClick={onAuth} className="btn-primary px-4 py-2.5 text-sm">
-                  Encuentra mi primer lead
+                <button
+                  type="button"
+                  onClick={onAuth}
+                  className="btn-primary whitespace-nowrap px-4 py-2.5 text-sm"
+                >
+                  <span className="sm:hidden">Mi primer lead</span>
+                  <span className="hidden sm:inline">Encuentra mi primer lead</span>
                 </button>
               </>
             )}

@@ -121,13 +121,66 @@ export interface ScanRun {
   error: string | null;
 }
 
+/** Periodos que ofrece el panel. El servidor recorta a 1–365. */
+export type StatsRange = 7 | 30 | 90;
+
+/** Un tramo de relevancia, para el histograma del panel. */
+export interface RelevanceBucket {
+  key: 'low' | 'mid' | 'good' | 'high';
+  label: string;
+  count: number;
+}
+
+/** Rendimiento de una comunidad en el periodo elegido. */
+export interface SubredditStat {
+  subreddit: string;
+  count: number;
+  averageRelevance: number | null;
+  highScore: number;
+}
+
+/** Cuántos posts del periodo mencionan una keyword del perfil. */
+export interface KeywordStat {
+  keyword: string;
+  count: number;
+}
+
+/** Cifras del periodo elegido (7, 30 o 90 días). */
+export interface PeriodStats {
+  total: number;
+  highScore: number;
+  pendingReplies: number;
+  averageRelevance: number | null;
+  averageUpvotes: number | null;
+  averageComments: number | null;
+}
+
 export interface Stats {
   today: number;
   averageRelevance: number | null;
   total: number;
   withReply: number;
+  byStatus: Record<LeadStatus, number>;
+  lastPostAt: string | null;
   byDay: Array<{ day: string; count: number; averageRelevance: number | null }>;
-  topSubreddits: Array<{ subreddit: string; count: number }>;
+  days: number;
+  periodStart: string;
+  period: PeriodStats;
+  previous: { total: number; averageRelevance: number | null };
+  relevance: RelevanceBucket[];
+  byHour: Array<{ hour: number; count: number }>;
+  subreddits: SubredditStat[];
+  keywords: KeywordStat[];
+  streak: number;
+  lastRun: {
+    status: ScanRun['status'];
+    started_at: string;
+    posts_new: number;
+    posts_fetched: number;
+    error: string | null;
+  } | null;
+  /** Los histogramas muestran el histórico porque el periodo no tiene posts. */
+  activityFallback: boolean;
 }
 
 // --- Endpoints -------------------------------------------------------------
@@ -136,6 +189,17 @@ export interface ProfileResponse {
   profile: Profile;
   runs: ScanRun[];
   pendingReplies: number;
+}
+
+export interface LeadQuery {
+  status?: string;
+  sort?: string;
+  search?: string;
+  minRelevance?: number;
+  /** Nombre de la comunidad, con o sin la `r/` delante. */
+  subreddit?: string;
+  limit?: number;
+  offset?: number;
 }
 
 export const api = {
@@ -165,14 +229,7 @@ export const api = {
   generatePendingReplies: () =>
     request<{ generated: number }>('/profile/replies', { method: 'POST' }),
 
-  getLeads: (params: {
-    status?: string;
-    sort?: string;
-    search?: string;
-    minRelevance?: number;
-    limit?: number;
-    offset?: number;
-  }) => {
+  getLeads: (params: LeadQuery) => {
     const query = new URLSearchParams();
     for (const [key, value] of Object.entries(params)) {
       if (value !== undefined && value !== '') query.set(key, String(value));
@@ -182,13 +239,40 @@ export const api = {
     );
   },
 
+  /**
+   * Todas las páginas de un filtro, seguidas y en orden. El servidor limita a
+   * 100 por página, así que el bucle para en cuanto se cubren los `total`.
+   */
+  getAllLeads: async (params: Omit<LeadQuery, 'limit' | 'offset'>): Promise<Lead[]> => {
+    const pageSize = 100;
+    const collected: Lead[] = [];
+    let total = 0;
+
+    for (let offset = 0; ; offset += pageSize) {
+      const page = await api.getLeads({ ...params, limit: pageSize, offset });
+      collected.push(...page.leads);
+      total = page.total;
+      // Sin resultados o con menos de una página completa, no hay más que pedir.
+      if (page.leads.length === 0 || collected.length >= total) break;
+    }
+
+    return collected;
+  },
+
   setLeadStatus: (leadId: string, status: LeadStatus) =>
     request<{ lead: Lead }>(`/leads/${leadId}/status`, { method: 'PATCH', body: { status } }),
+
+  /** Aplica un estado a varios posts de una vez (el servidor acepta hasta 100). */
+  setLeadsStatus: (leadIds: string[], status: LeadStatus) =>
+    request<{ updated: number }>('/leads/bulk', { method: 'POST', body: { ids: leadIds, status } }),
+
+  /** Vacía la pila de descartados de una sola vez. */
+  deleteDismissed: () => request<{ deleted: number }>('/leads?status=dismissed', { method: 'DELETE' }),
 
   generateReply: (leadId: string) =>
     request<{ lead: Lead }>(`/leads/${leadId}/reply`, { method: 'POST' }),
 
   deleteLead: (leadId: string) => request<void>(`/leads/${leadId}`, { method: 'DELETE' }),
 
-  getStats: () => request<{ stats: Stats }>('/stats'),
+  getStats: (days: StatsRange = 30) => request<{ stats: Stats }>(`/stats?days=${days}`),
 };

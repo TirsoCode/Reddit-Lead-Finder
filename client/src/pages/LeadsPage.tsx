@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { api, ApiError, type Lead, type LeadStatus } from '../lib/api';
 import { cx } from '../lib/format';
 import { PostCard } from '../components/PostCard';
@@ -34,14 +35,28 @@ const MIN_SCORE_OPTIONS = [
   { value: 80, label: '80+' },
 ];
 
+/** Los enlaces del panel entran por aquí: /leads?estado=saved&comunidad=SaaS. */
+function readStatus(value: string | null): LeadStatus | 'all' {
+  return FILTERS.some((filter) => filter.value === value) ? (value as LeadStatus | 'all') : 'new';
+}
+
+function readSort(value: string | null): string {
+  return SORTS.some((option) => option.value === value) ? (value as string) : 'relevance';
+}
+
 export function LeadsPage({ pendingReplies, onProfileChange }: LeadsPageProps) {
+  const [params, setParams] = useSearchParams();
   const [leads, setLeads] = useState<Lead[]>([]);
   const [total, setTotal] = useState(0);
-  const [status, setStatus] = useState<LeadStatus | 'all'>('new');
-  const [sort, setSort] = useState('relevance');
-  const [minRelevance, setMinRelevance] = useState(0);
-  const [searchInput, setSearchInput] = useState('');
-  const [search, setSearch] = useState('');
+  const [status, setStatus] = useState<LeadStatus | 'all'>(() => readStatus(params.get('estado')));
+  const [sort, setSort] = useState(() => readSort(params.get('orden')));
+  const [minRelevance, setMinRelevance] = useState(() => {
+    const value = Number.parseInt(params.get('minimo') ?? '0', 10);
+    return Number.isFinite(value) ? value : 0;
+  });
+  const [subreddit, setSubreddit] = useState(params.get('comunidad') ?? '');
+  const [searchInput, setSearchInput] = useState(params.get('buscar') ?? '');
+  const [search, setSearch] = useState(params.get('buscar') ?? '');
   const [page, setPage] = useState(0);
 
   const [loading, setLoading] = useState(true);
@@ -49,6 +64,18 @@ export function LeadsPage({ pendingReplies, onProfileChange }: LeadsPageProps) {
   const [scanning, setScanning] = useState(false);
   const [generatingAll, setGeneratingAll] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
+
+  // Los filtros viven en la URL: así el enlace de una tarjeta del panel llega
+  // con su filtro puesto, y recargar no los pierde.
+  useEffect(() => {
+    const next = new URLSearchParams();
+    if (status !== 'new') next.set('estado', status);
+    if (sort !== 'relevance') next.set('orden', sort);
+    if (minRelevance > 0) next.set('minimo', String(minRelevance));
+    if (subreddit.trim()) next.set('comunidad', subreddit.trim());
+    if (search.trim()) next.set('buscar', search.trim());
+    setParams(next, { replace: true });
+  }, [status, sort, minRelevance, subreddit, search, setParams]);
 
   // La búsqueda del servidor se aplica con un pequeño retardo.
   useEffect(() => {
@@ -67,6 +94,7 @@ export function LeadsPage({ pendingReplies, onProfileChange }: LeadsPageProps) {
         status,
         sort,
         search: search || undefined,
+        subreddit: subreddit.trim() || undefined,
         minRelevance: minRelevance > 0 ? minRelevance : undefined,
         limit: PAGE_SIZE,
         offset: page * PAGE_SIZE,
@@ -78,7 +106,7 @@ export function LeadsPage({ pendingReplies, onProfileChange }: LeadsPageProps) {
     } finally {
       setLoading(false);
     }
-  }, [status, sort, search, minRelevance, page]);
+  }, [status, sort, search, subreddit, minRelevance, page]);
 
   useEffect(() => {
     void load();
