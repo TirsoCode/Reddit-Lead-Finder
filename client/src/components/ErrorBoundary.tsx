@@ -6,6 +6,7 @@ interface Props {
 
 interface State {
   error: Error | null;
+  stack: string;
 }
 
 /**
@@ -13,18 +14,20 @@ interface State {
  * desmonta el árbol entero y no queda nada en pantalla. Aquí se atrapa, se
  * avisa y se ofrece recargar.
  *
- * El detalle técnico solo se muestra en desarrollo. En producción va a la
- * consola, que es donde se mira cuando algo falla de verdad.
+ * El mensaje se muestra siempre, también en producción: si no, la única pista es
+ * la consola y no hay forma de depurar a distancia. Solo el stack va plegado.
  */
 export class ErrorBoundary extends Component<Props, State> {
-  state: State = { error: null };
+  state: State = { error: null, stack: '' };
 
   static getDerivedStateFromError(error: Error): State {
-    return { error };
+    // El stack lo rellena componentDidCatch, que se llama justo después.
+    return { error, stack: '' };
   }
 
   componentDidCatch(error: Error, info: ErrorInfo): void {
     console.error('[ErrorBoundary] fallo al pintar', error, info.componentStack);
+    this.setState({ stack: info.componentStack ?? '' });
   }
 
   private reload = () => window.location.reload();
@@ -44,10 +47,19 @@ export class ErrorBoundary extends Component<Props, State> {
             backend todavía va con la versión anterior.
           </p>
 
-          {import.meta.env.DEV ? (
-            <pre className="mt-4 max-h-40 overflow-auto rounded-lg bg-surface-subtle p-3 text-left text-xs text-ink-soft dark:bg-neutral-800 dark:text-neutral-300">
-              {error.message}
-            </pre>
+          <pre className="mt-4 max-h-32 overflow-auto rounded-lg bg-surface-subtle p-3 text-left text-xs text-ink-soft dark:bg-neutral-800 dark:text-neutral-300">
+            {error.message}
+          </pre>
+
+          {this.state.stack ? (
+            <details className="mt-2 text-left">
+              <summary className="cursor-pointer text-xs text-ink-muted dark:text-neutral-400">
+                Ver traza
+              </summary>
+              <pre className="mt-2 max-h-40 overflow-auto rounded-lg bg-surface-subtle p-3 text-left text-[11px] text-ink-soft dark:bg-neutral-800 dark:text-neutral-300">
+                {this.state.stack.trim()}
+              </pre>
+            </details>
           ) : null}
 
           <div className="mt-5 flex justify-center gap-2">
@@ -58,7 +70,7 @@ export class ErrorBoundary extends Component<Props, State> {
               type="button"
               className="btn-secondary"
               onClick={() => {
-                this.setState({ error: null });
+                this.setState({ error: null, stack: '' });
               }}
             >
               Reintentar
