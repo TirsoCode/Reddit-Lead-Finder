@@ -7,7 +7,13 @@ const log = createLogger('reddit');
 
 const AUTH_URL = 'https://www.reddit.com/api/v1/access_token';
 const API_BASE = 'https://oauth.reddit.com';
-const MIN_INTERVAL_MS = 250;
+/**
+ * El nivel gratuito de la API son 100 consultas por minuto y cliente OAuth, con
+ * una ventana móvil. 250 ms entre peticiones son 240/min, o sea el triple: con
+ * dos o tres usuarios escaneando a la vez Reddit empieza a devolver 429. A 750 ms
+ * son 80/min, con margen para los picos de las 8:00 y las 20:00.
+ */
+const MIN_INTERVAL_MS = 750;
 const MAX_RETRIES = 3;
 
 interface Token {
@@ -110,8 +116,12 @@ class RedditClient {
       }
 
       if (response.status === 429) {
-        const resetSeconds = Number(response.headers.get('x-ratelimit-reset') ?? '5');
-        const waitMs = Math.max(1_000, resetSeconds * 1000);
+        // En el nivel gratuito no siempre llega x-ratelimit-reset, y esperar
+        // solo unos segundos no basta para vaciar la ventana de 60s. La espera
+        // se dobla en cada intento: 10s, 20s, 40s.
+        const resetSeconds = Number(response.headers.get('x-ratelimit-reset') ?? '0');
+        const headerMs = (Number.isFinite(resetSeconds) ? resetSeconds : 0) * 1000;
+        const waitMs = Math.max(10_000 * 2 ** (attempt - 1), headerMs);
         log.warn(`Límite de Reddit alcanzado; esperando ${Math.round(waitMs / 1000)}s`);
         await new Promise((resolve) => setTimeout(resolve, waitMs));
         continue;
