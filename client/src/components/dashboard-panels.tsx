@@ -250,10 +250,10 @@ export function GoalsCard({ stats }: GoalsCardProps) {
 
   const postsThisWeek = useMemo(() => sumLastDays(stats?.byDay ?? [], 7), [stats?.byDay]);
   const weeklyRatio = goals.weeklyPosts > 0 ? postsThisWeek / goals.weeklyPosts : 0;
-  const periodTotal = stats?.period.total ?? 0;
+  const periodTotal = stats?.period?.total ?? 0;
   const relevantRatio =
-    periodTotal > 0 ? (stats?.period.highScore ?? 0) / Math.max(1, periodTotal) / (goals.minRelevance / 100) : 0;
-  const replies = stats?.byStatus.replied ?? 0;
+    periodTotal > 0 ? (stats?.period?.highScore ?? 0) / Math.max(1, periodTotal) / (goals.minRelevance / 100) : 0;
+  const replies = stats?.byStatus?.replied ?? 0;
   const repliesRatio = goals.totalReplies > 0 ? replies / goals.totalReplies : 0;
 
   return (
@@ -266,7 +266,7 @@ export function GoalsCard({ stats }: GoalsCardProps) {
       />
       <GoalRow
         label={`Relevancia ${goals.minRelevance}+ en el periodo`}
-        value={`${formatCount(stats?.period.highScore ?? 0)} de ${formatCount(periodTotal)}`}
+        value={`${formatCount(stats?.period?.highScore ?? 0)} de ${formatCount(periodTotal)}`}
         ratio={relevantRatio}
         tone="brand"
       />

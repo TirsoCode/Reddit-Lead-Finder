@@ -333,7 +333,7 @@ export function Dashboard({ profile, runs, onProfileChange, onOpenLeads }: Dashb
   const notes = useMemo(() => buildHealthNotes({ profile, stats, runs }), [profile, stats, runs]);
 
   const visibleLeads = topLeads.slice(0, topLimit);
-  const totalTrend = stats?.byDay.reduce((sum, day) => sum + day.count, 0) ?? 0;
+  const totalTrend = stats?.byDay?.reduce((sum, day) => sum + day.count, 0) ?? 0;
 
   return (
     <div className="space-y-8">
@@ -388,36 +388,36 @@ export function Dashboard({ profile, runs, onProfileChange, onOpenLeads }: Dashb
             <StatCard
               compact={compact}
               label="Posts en el periodo"
-              value={formatCount(stats?.period.total ?? 0)}
-              hint={`${stats?.period.highScore ?? 0} con relevancia 60 o más`}
-              accent={(stats?.period.total ?? 0) > 0}
-              delta={computeDelta(stats?.period.total ?? 0, stats?.previous.total ?? 0)}
-              spark={stats?.byDay.map((day) => day.count)}
+              value={formatCount(stats?.period?.total ?? 0)}
+              hint={`${stats?.period?.highScore ?? 0} con relevancia 60 o más`}
+              accent={(stats?.period?.total ?? 0) > 0}
+              delta={computeDelta(stats?.period?.total ?? 0, stats?.previous?.total ?? 0)}
+              spark={stats?.byDay?.map((day) => day.count)}
             />
             <StatCard
               compact={compact}
               label="Relevancia media"
-              value={stats?.period.averageRelevance ?? '—'}
-              hint={`${stats?.period.highScore ?? 0} oportunidades de ${stats?.period.total ?? 0}`}
-              delta={computeDelta(stats?.period.averageRelevance ?? 0, stats?.previous.averageRelevance ?? 0, 1)}
-              spark={stats?.byDay.map((day) => day.averageRelevance ?? 0)}
+              value={stats?.period?.averageRelevance ?? '—'}
+              hint={`${stats?.period?.highScore ?? 0} oportunidades de ${stats?.period?.total ?? 0}`}
+              delta={computeDelta(stats?.period?.averageRelevance ?? 0, stats?.previous?.averageRelevance ?? 0, 1)}
+              spark={stats?.byDay?.map((day) => day.averageRelevance ?? 0)}
               sparkScale100
             />
             <StatCard
               compact={compact}
               label="Guardados y respondidos"
-              value={formatCount((stats?.byStatus.saved ?? 0) + (stats?.byStatus.replied ?? 0))}
+              value={formatCount((stats?.byStatus?.saved ?? 0) + (stats?.byStatus?.replied ?? 0))}
               hint={`${formatPercent(
-                (stats?.byStatus.saved ?? 0) + (stats?.byStatus.replied ?? 0),
+                (stats?.byStatus?.saved ?? 0) + (stats?.byStatus?.replied ?? 0),
                 stats?.total ?? 0,
               )} de tu bandeja`}
             />
             <StatCard
               compact={compact}
               label="Respondidos"
-              value={formatCount(stats?.byStatus.replied ?? 0)}
-              hint={`${stats?.period.pendingReplies ?? 0} sin respuesta en el periodo`}
-              accent={(stats?.byStatus.replied ?? 0) > 0}
+              value={formatCount(stats?.byStatus?.replied ?? 0)}
+              hint={`${stats?.period?.pendingReplies ?? 0} sin respuesta en el periodo`}
+              accent={(stats?.byStatus?.replied ?? 0) > 0}
             />
           </>
         )}
@@ -468,11 +468,11 @@ export function Dashboard({ profile, runs, onProfileChange, onOpenLeads }: Dashb
 
             <SectionCard
               title="Distribución de relevancia"
-              description={`Cómo se reparten los ${formatCount(stats?.period.total ?? 0)} posts del periodo.`}
+              description={`Cómo se reparten los ${formatCount(stats?.period?.total ?? 0)} posts del periodo.`}
             >
               <RelevanceDistribution
                 buckets={stats?.relevance ?? []}
-                total={stats?.period.total ?? 0}
+                total={stats?.period?.total ?? 0}
               />
             </SectionCard>
           </div>
@@ -617,7 +617,7 @@ export function Dashboard({ profile, runs, onProfileChange, onOpenLeads }: Dashb
               scanning={scanning}
               generating={generating}
               exporting={exporting}
-              pendingReplies={stats?.period.pendingReplies ?? 0}
+              pendingReplies={stats?.period?.pendingReplies ?? 0}
               summaryReady={Boolean(stats && profile)}
               onScan={handleScan}
               onGenerate={handleGenerateAll}

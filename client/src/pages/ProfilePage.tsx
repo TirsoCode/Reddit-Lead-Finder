@@ -195,7 +195,7 @@ export function ProfilePage({ profile, runs, onProfileChange }: ProfilePageProps
           ) : null}
         </div>
 
-        {!profile?.keywords.length ? (
+        {!profile?.keywords?.length ? (
           <p className="mt-6 rounded-lg bg-surface-subtle dark:bg-neutral-900 px-4 py-6 text-center text-sm text-ink-muted dark:text-neutral-400">
             Aún no hay keywords. Analiza tu web para generarlas.
           </p>
